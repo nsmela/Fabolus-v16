@@ -1,0 +1,106 @@
+﻿<mah:MetroWindow x:Class="Fabolus_v16.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:local="clr-namespace:Fabolus_v16" 
+        xmlns:viewmodels="clr-namespace:Fabolus_v16.MVVM.ViewModels" 
+        xmlns:views="clr-namespace:Fabolus_v16.MVVM.Views"
+        mc:Ignorable="d"
+        Title="Fabolus" Height="550" Width="800" MinHeight="520" MinWidth="600">
+    <Window.DataContext>
+        <viewmodels:MainViewModel />
+    </Window.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="64" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="28" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.ColumnSpan="2" 
+                    Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}" 
+                    VerticalAlignment="Stretch" Orientation="Horizontal" 
+                    Margin="2">
+
+            <!-- App State -->
+            <StackPanel Width="200" Orientation="Horizontal">
+                <Label Content="{Binding CurrentViewTitle}" 
+                        HorizontalAlignment="Left" 
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                        FontSize="24" 
+                        FontWeight="Bold"
+                        FontFamily="\Fonts\#Poppins" 
+                        Margin="10,0,0,0"/>
+            </StackPanel>
+
+            <!-- View Select -->
+            <StackPanel Orientation="Horizontal">
+                <Button Command="{Binding ImportSTLCommand}"
+                        Style="{StaticResource MahApps.Styles.Button.Flat}"
+                        Margin="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="60" Height="60" 
+                        ToolTip="Import Mesh" >
+                    <iconPacks:MaterialDesign Width="40" Height="40" Kind="AddBox"/>
+                </Button>
+                <Button Command="{Binding SmoothViewCommand}"
+                        Style="{StaticResource MahApps.Styles.Button.Flat}"
+                        Margin="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="60" Height="60" 
+                        ToolTip="Smooth Mesh" >
+                    <iconPacks:MaterialDesign Width="40" Height="40" Kind="RoundedCorner" />
+                </Button>
+                <Button Command="{Binding RotationViewCommand}"
+                        Style="{StaticResource MahApps.Styles.Button.Flat}"
+                        Margin="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="60" Height="60" 
+                        ToolTip="Rotate Mesh" >
+                    <iconPacks:MaterialDesign Width="40" Height="40" Kind="_3dRotation" />
+                </Button>
+                <Button Command="{Binding AirChannelsViewCommand}"
+                        Style="{StaticResource MahApps.Styles.Button.Flat}"
+                        Margin="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="60" Height="60" 
+                        ToolTip="Add Air Channels for Mold" >
+                    <iconPacks:MaterialDesign Width="40" Height="40" Kind="Label" />
+                </Button>
+                <Button Command="{Binding MoldViewCommand}"
+                        Style="{StaticResource MahApps.Styles.Button.Flat}"
+                        Margin="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="60" Height="60" 
+                        ToolTip="Create a Mold" >
+                    <iconPacks:MaterialDesign Width="40" Height="40" Kind="DonutLarge" />
+                </Button>
+                <Button Command="{Binding ExportMeshCommand}"
+                        Style="{StaticResource MahApps.Styles.Button.Flat}"
+                        Margin="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="60" Height="60" 
+                        ToolTip="Export To File">
+                    <iconPacks:MaterialDesign Width="40" Height="40" Kind="Save" />
+                </Button>
+
+            </StackPanel>
+        </StackPanel>
+        
+        <!--  MeshView -->
+        <ContentControl Content="{Binding MeshVM}" Grid.Column="1" Grid.Row="1" />
+
+        <!-- Tools View -->
+        <ContentControl Content="{Binding CurrentViewModel}" 
+                        Grid.Row="1" Grid.Column="0" 
+                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                Margin="2,0,2,0" />
+        <!-- Information bar View -->
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" 
+                    Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}" 
+                    Margin="2">
+            <Label Style="{DynamicResource MahApps.Styles.Label}" 
+                   HorizontalAlignment="Right"
+                   Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                   Content="{Binding BolusVolume}" />
+        </StackPanel>
+        
+    </Grid>
+</mah:MetroWindow>
