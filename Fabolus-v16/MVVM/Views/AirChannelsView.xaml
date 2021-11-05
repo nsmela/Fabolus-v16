@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="Fabolus_v16.MVVM.Views.AirChannelsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModels="clr-namespace:Fabolus_v16.MVVM.ViewModels"
+             xmlns:local="clr-namespace:Fabolus_v16.MVVM.Views"
+             xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             d:DataContext="{d:DesignInstance Type=viewModels:AirChannelsViewModel}"
+             xmlns:b="clr-namespace:Fabolus_v16.Behaviors"
+             mc:Ignorable="d" 
+             d:DesignHeight="520" d:DesignWidth="200" 
+             Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}">
+    <StackPanel HorizontalAlignment="Stretch" 
+                VerticalAlignment="Top" 
+                Margin="4,0,4,0">
+        <Label Content="channel radius" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                        FontSize="12" 
+                        FontWeight="Bold"
+                        FontFamily="\Fonts\#Poppins"/>
+        <Slider Value="{Binding ChannelRadius, Mode=TwoWay}"
+                        Minimum="1" 
+                        Maximum="5" 
+                        TickFrequency="0.5" 
+                        TickPlacement="TopLeft" 
+                        IsSnapToTickEnabled="True" 
+                        Height="30"/>
+        <StackPanel HorizontalAlignment="Stretch" 
+                    VerticalAlignment="Top" 
+                    Margin="4,0,4,0">
+            <Button Content="clear" 
+                Height="30"
+                HorizontalAlignment="Stretch"
+                Style="{StaticResource MahApps.Styles.Button}"
+                FontSize="14" 
+                FontWeight="Bold"
+                FontFamily="\Fonts\#Poppins"
+                Command="{Binding ClearAirChannelsCommand}" />
+        </StackPanel>
+    </StackPanel>
+
+</UserControl>

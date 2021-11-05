@@ -1,0 +1,166 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--Template when the orientation of the Slider is Horizontal.-->
+    <Style x:Key="xSliderThumbStyle" TargetType="{x:Type Thumb}" >
+        <Setter Property="SnapsToDevicePixels" Value="False" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Height" Value="14" />
+        <Setter Property="Width" Value="14" />
+        <Setter Property="Template" >
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Ellipse x:Name="Ellipse" StrokeThickness="2">
+                        <Ellipse.Stroke>
+                            <SolidColorBrush Color="#13192d" />
+                        </Ellipse.Stroke>
+                        <Ellipse.Fill>
+                            <SolidColorBrush Color="Red" />
+                        </Ellipse.Fill>
+
+                    </Ellipse>
+                </ControlTemplate>
+            </Setter.Value>
+
+        </Setter>
+    </Style>
+    
+    <ControlTemplate x:Key="xAxisRotationSliderTheme"
+                 TargetType="{x:Type Slider}">
+        
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" MinHeight="10" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Border x:Name="TrackBackground"
+            Margin="0"
+            CornerRadius="2"
+            Height="6"
+            Grid.Row="1"
+            BorderThickness="1">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="#13192d" />
+                </Border.BorderBrush>
+                <Border.Background>
+                    <SolidColorBrush Color="Red" /> 
+                </Border.Background>
+            </Border>
+            <Track Grid.Row="1" x:Name="PART_Track">
+                <Track.Thumb>
+                    <Thumb Style="{StaticResource xSliderThumbStyle}" />
+                </Track.Thumb>
+            </Track>
+        </Grid>
+    </ControlTemplate>
+
+    <Style x:Key="ySliderThumbStyle" TargetType="{x:Type Thumb}" >
+        <Setter Property="SnapsToDevicePixels" Value="False" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Height" Value="14" />
+        <Setter Property="Width" Value="14" />
+        <Setter Property="Template" >
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Ellipse x:Name="Ellipse" StrokeThickness="2">
+                        <Ellipse.Stroke>
+                            <SolidColorBrush Color="#13192d" />
+                        </Ellipse.Stroke>
+                        <Ellipse.Fill>
+                            <SolidColorBrush Color="Green" />
+                        </Ellipse.Fill>
+
+                    </Ellipse>
+                </ControlTemplate>
+            </Setter.Value>
+
+        </Setter>
+    </Style>
+
+    <ControlTemplate x:Key="yAxisRotationSliderTheme"
+                 TargetType="{x:Type Slider}">
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" MinHeight="10" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Border x:Name="TrackBackground"
+            Margin="0"
+            CornerRadius="2"
+            Height="6"
+            Grid.Row="1"
+            BorderThickness="1">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="#13192d" />
+                </Border.BorderBrush>
+                <Border.Background>
+                    <SolidColorBrush Color="Green" />
+                </Border.Background>
+            </Border>
+            <Track Grid.Row="1" x:Name="PART_Track">
+                <Track.Thumb>
+                    <Thumb Style="{StaticResource ySliderThumbStyle}" />
+                </Track.Thumb>
+            </Track>
+        </Grid>
+    </ControlTemplate>
+
+    <Style x:Key="zSliderThumbStyle" TargetType="{x:Type Thumb}" >
+        <Setter Property="SnapsToDevicePixels" Value="False" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Height" Value="14" />
+        <Setter Property="Width" Value="14" />
+        <Setter Property="Template" >
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Ellipse x:Name="Ellipse" StrokeThickness="2">
+                        <Ellipse.Stroke>
+                            <SolidColorBrush Color="#13192d" />
+                        </Ellipse.Stroke>
+                        <Ellipse.Fill>
+                            <SolidColorBrush Color="Blue" />
+                        </Ellipse.Fill>
+
+                    </Ellipse>
+                </ControlTemplate>
+            </Setter.Value>
+
+        </Setter>
+    </Style>
+
+    <ControlTemplate x:Key="zAxisRotationSliderTheme"
+                 TargetType="{x:Type Slider}">
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" MinHeight="10" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Border x:Name="TrackBackground"
+            Margin="0"
+            CornerRadius="2"
+            Height="6"
+            Grid.Row="1"
+            BorderThickness="1">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="#13192d" />
+                </Border.BorderBrush>
+                <Border.Background>
+                    <SolidColorBrush Color="Blue" />
+                </Border.Background>
+            </Border>
+            <Track Grid.Row="1" x:Name="PART_Track">
+                <Track.Thumb>
+                    <Thumb Style="{StaticResource zSliderThumbStyle}" />
+                </Track.Thumb>
+            </Track>
+        </Grid>
+    </ControlTemplate>
+
+</ResourceDictionary>
