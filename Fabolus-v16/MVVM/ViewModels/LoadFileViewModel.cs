@@ -20,8 +20,14 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			LoadFileCommand = new LoadSTLCommand(mainViewModel, _bolusStore);
 
 			//clears any bolus models displayed
+<<<<<<< HEAD
 			_bolusStore.PreviewMoldVisibility = false;
 			_bolusStore.CurrentBolus = null;
+=======
+			_bolusStore.ShowMold = false;
+			_bolusStore.CurrentBolus = null;
+			_bolusStore.ClearMoldMesh();
+>>>>>>> f515dd86a6ca9e6222f7fee84afa24d6c06f65d7
 			_bolusStore.ClearBolusTransforms();
 		}
 	}

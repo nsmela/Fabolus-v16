@@ -65,7 +65,11 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			SmoothViewCommand = new NavigateCommand<SmoothViewModel>(new Services.NavigationService<SmoothViewModel>(MainNavigationStore, () => new SmoothViewModel(this, MainBolusStore)));
 			RotationViewCommand = new NavigateCommand<RotateViewModel>(new Services.NavigationService<RotateViewModel>(MainNavigationStore, () => new RotateViewModel(this, MainBolusStore)));
 			AirChannelsViewCommand = new NavigateCommand<AirChannelsViewModel>(new Services.NavigationService<AirChannelsViewModel>(MainNavigationStore, () => new AirChannelsViewModel(this)));
+<<<<<<< HEAD
 			MoldViewCommand = new NavigateCommand<MoldViewModel>(new Services.NavigationService<MoldViewModel>(MainNavigationStore, () => new MoldViewModel(this)));
+=======
+			//MoldViewCommand = new NavigateCommand<MoldViewModel>(new Services.NavigationService<MoldViewModel>(MainNavigationStore, () => new MoldViewModel(MainBolusStore)));
+>>>>>>> f515dd86a6ca9e6222f7fee84afa24d6c06f65d7
 
 			ImportSTLCommand = new LoadSTLCommand(this, _bolusStore);
 			ExportMeshCommand = new ExportMeshCommand(_bolusStore);
