@@ -2,6 +2,7 @@
 using Fabolus_v16.MVVM.ViewModels;
 using g3;
 using System;
+using System.Collections.Generic;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 namespace Fabolus_v16.Stores {
@@ -85,7 +86,7 @@ namespace Fabolus_v16.Stores {
 			skin.Brush.Opacity = opacity;
 
 			//transforms
-			Transform3DGroup transformGroup = _bolusTransform.Clone();
+			Transform3DGroup transformGroup = TransformGroup;
 			transformGroup.Children.Add(new RotateTransform3D(_tempRotation)); //from bolusStore
 			var result = new GeometryModel3D(mesh, skin);
 			result.BackMaterial = skin;
@@ -131,33 +132,33 @@ namespace Fabolus_v16.Stores {
 			}
 		}
 
-		private DMesh3 ApplyBolusRotation() {
-			Transform3DGroup transformGroup = _bolusTransform.Clone();
-			transformGroup.Children.Add(new RotateTransform3D(_tempRotation)); //from bolusStore
+		private DMesh3 ApplyBolusRotation(DMesh3 mesh) {
+			DMesh3 result = new DMesh3(mesh); //copy the mesh to prevent transforming the old one
+			foreach(var q in _bolusRotation)
+				MeshTransforms.Rotate(result, Vector3d.Zero, q);
 
-			foreach(var t in transformGroup.Children) {
-				RotateTransform3D r = (RotateTransform3D)t;
-				r.
-			}
-			var result = transformGroup.Transform(CurrentBolus.MeshGeometry.Positions);
-
-			HelixToolkit.Wpf.MeshBuilder mb = new HelixToolkit.Wpf.MeshBuilder();
-			mb.Append(CurrentBolus.MeshGeometry);
-			mb.ToMesh();
-
-
-			return mesh;
+			return result;
 		}
 
 		private Transform3DGroup _bolusTransform = new();
+		private List<Quaterniond> _bolusRotation;
 
 		public Transform3DGroup TransformGroup { get => _bolusTransform.Clone(); }
-		public void AddTransform(RotateTransform3D rotation) {
-			_bolusTransform.Children.Add(rotation);
+		
+		public void AddTransform(Vector3D axis, double angle) {
+			//rotation for DMesh3
+			if (_bolusRotation == null)
+				_bolusRotation = new List<Quaterniond>();
+
+			_bolusRotation.Add(new Quaterniond(new Vector3d(axis.X, axis.Y, axis.Z), angle));
+
+			var rotate = new AxisAngleRotation3D(axis, angle);
+			_bolusTransform.Children.Add(new RotateTransform3D(rotate));
 			OnCurrentBolusChanged();
 		}
 		public void ClearBolusTransforms() {
 			_bolusTransform.Children.Clear();
+			_bolusRotation = new List<Quaterniond>();
 
 			OnBolusRotate();
 			OnCurrentBolusChanged();
@@ -176,12 +177,14 @@ namespace Fabolus_v16.Stores {
 		 */
 		private bool _previewMold = false;
 		private double _moldOffset = 2.5f;
+		private int _moldResolution = 64;
 		private float _moldOpacity = 0.3f;
 		private Color _moldColor = Colors.Violet;
 		private MoldTypes _moldType = 0;
 
 		public bool PreviewMoldVisibility { set { _previewMold = value;	OnMoldChanged(); } }
 		public double MoldOffset { get => _moldOffset;  set { _moldOffset = value; OnMoldChanged(); } }
+		public int MoldResolution { get => _moldResolution; set { _moldResolution = value; OnMoldChanged(); } }
 		public float MoldOpacity { get => _moldOpacity; set { _moldOpacity = value; OnMoldChanged(); } }
 		public Color MoldColor { get => _moldColor; set { _moldColor = value; OnMoldChanged(); } }
 		public MoldTypes MoldType { get => _moldType; set { _moldType = value; OnMoldChanged(); } }
@@ -202,7 +205,7 @@ namespace Fabolus_v16.Stores {
 			}
 		}
 
-
+		
 
 
 

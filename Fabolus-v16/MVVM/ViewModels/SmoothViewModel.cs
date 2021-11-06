@@ -38,11 +38,8 @@ namespace Fabolus_v16.MVVM.ViewModels {
 
 			Bolus bolus = new Bolus(BolusTools.Smooth(_edgeSize, _smoothSpeed, (double)_iterations, (double)_marchingCubes, _bolusStore.BolusRaw));
 			_bolusStore.BolusSmoothed = bolus;
-<<<<<<< HEAD
+
 			_bolusStore.PreviewMoldVisibility = false;
-=======
-			_bolusStore.ShowMold = false;
->>>>>>> f515dd86a6ca9e6222f7fee84afa24d6c06f65d7
 		}
 
 		public ICommand ClearSmoothedBolusCommand { get; }

@@ -53,6 +53,8 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		public MoldViewModel(MainViewModel mainViewModel) {
 			_bolusStore = mainViewModel.MainBolusStore;
 			_bolusStore.PreviewMoldVisibility = true;
+			OffsetDistance = (float)_bolusStore.MoldOffset;
+			Resolution = _bolusStore.MoldResolution;
 		}
 
 		public override void OnExit() {

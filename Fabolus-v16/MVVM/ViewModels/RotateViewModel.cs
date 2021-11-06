@@ -101,7 +101,7 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			//save the slider's adjustment to the bolus
 			var rotate = new AxisAngleRotation3D(_axisVector, angle);
 			var rotationTransform = new RotateTransform3D(rotate);
-			_bolusStore.AddTransform(rotationTransform);
+			_bolusStore.AddTransform(_axisVector, angle);
 
 			//reset slider object
 			_xAxisAngle = 0f;

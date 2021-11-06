@@ -26,7 +26,7 @@ namespace Fabolus_v16.MVVM.ViewModels {
 				return null;
 			}
 		}
-<<<<<<< HEAD
+
 
 		public float BolusHeight {
 			get {
@@ -38,8 +38,6 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			}
 		}
 
-=======
->>>>>>> f515dd86a6ca9e6222f7fee84afa24d6c06f65d7
 		#endregion
 
 		private bool _meshVisibility;
@@ -57,23 +55,16 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			_meshVisibility = true;
 
 			_bolusStore.CurrentBolusChanged += OnCurrentBolusChanged;
-<<<<<<< HEAD
 			_bolusStore.MoldChanged += OnMoldChanged;
 			_airChannelStore.AirChannelsChanged += OnAirChannelsChanged;
 			_airChannelStore.PreviewChannelChanged += OnPreviewAirChannelChanged;
 
-=======
-			_airChannelStore.AirChannelsChanged += OnAirChannelsChanged;
-			_airChannelStore.PreviewChannelChanged += OnPreviewAirChannelChanged;
->>>>>>> f515dd86a6ca9e6222f7fee84afa24d6c06f65d7
 		}
 
 		public override void OnExit() {
 			_bolusStore.CurrentBolusChanged -= OnCurrentBolusChanged;
-<<<<<<< HEAD
 			_bolusStore.MoldChanged -= OnMoldChanged;
-=======
->>>>>>> f515dd86a6ca9e6222f7fee84afa24d6c06f65d7
+
 			_airChannelStore.AirChannelsChanged -= OnAirChannelsChanged;
 			_airChannelStore.PreviewChannelChanged -= OnPreviewAirChannelChanged;
 		}
@@ -92,12 +83,9 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		private void OnPreviewAirChannelChanged() {
 			OnPropertyChanged(nameof(PreviewAirChannelMesh));
 		}
-<<<<<<< HEAD
 		private void OnMoldChanged() {
 			OnPropertyChanged(nameof(MoldMesh));
 		}
-=======
->>>>>>> f515dd86a6ca9e6222f7fee84afa24d6c06f65d7
 
 		#endregion
 
@@ -183,11 +171,8 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		}
 		#endregion
 
-<<<<<<< HEAD
 		#region Air Channels
-=======
-		#region airholes
->>>>>>> f515dd86a6ca9e6222f7fee84afa24d6c06f65d7
+
 		private AirChannelStore _airChannelStore;
 		public AirChannelStore AirChannels { get => _airChannelStore; }
 
@@ -214,7 +199,6 @@ namespace Fabolus_v16.MVVM.ViewModels {
 
 		#endregion
 
-<<<<<<< HEAD
 		#region Mold
 		//dependancy object for view to display the mesh
 		//includes a check if it should be visible
@@ -225,8 +209,6 @@ namespace Fabolus_v16.MVVM.ViewModels {
 
 		#endregion
 
-=======
->>>>>>> f515dd86a6ca9e6222f7fee84afa24d6c06f65d7
 		#region Extending Access to the viewport to allow mouse events to be handled
 		private RelayCommand _mouseUpCommand;
 		public RelayCommand MouseUpCommand {
@@ -264,10 +246,7 @@ namespace Fabolus_v16.MVVM.ViewModels {
 				return;
 
 			var result = MouseToMesh(sender, e);
-<<<<<<< HEAD
 
-=======
->>>>>>> f515dd86a6ca9e6222f7fee84afa24d6c06f65d7
 			MeshHit = result;
 		}
 		private void MouseMove(object sender, MouseEventArgs e) {
@@ -279,10 +258,7 @@ namespace Fabolus_v16.MVVM.ViewModels {
 				return;
 
 			var result = MouseToMesh(sender, e);
-<<<<<<< HEAD
 
-=======
->>>>>>> f515dd86a6ca9e6222f7fee84afa24d6c06f65d7
 			MeshHitMouseMove = result;
 		}
 
