@@ -68,14 +68,32 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			_bolusStore.MoldResolution = _resolution; //will update mold
 		}
 
+		private int _moldShape;
+		public int MoldShape {
+			get => _moldShape;
+			set {
+				_moldShape = value;
+				OnPropertyChanged(nameof(MoldShape));
+			}
+		}
+		public ICommand MoldTypeSliderDragCompleteCommand { get; }
+		private void MoldTypeSliderDragComplete() {
+			if ((int)_bolusStore.MoldType == _moldShape)
+				return;//don't update and waste time
+
+			_bolusStore.MoldType = (MoldTypes)_moldShape; //will update mold
+		}
+
 		public MoldViewModel(MainViewModel mainViewModel) {
 			_bolusStore = mainViewModel.MainBolusStore;
 			_bolusStore.PreviewMoldVisibility = true;
 			OffsetDistance = (float)_bolusStore.MoldOffset;
 			Resolution = _bolusStore.MoldResolution;
+			MoldShape = (int)_bolusStore.MoldType;
 
 			OffsetDistanceSliderDragCompleteCommand = new RelayCommand(param => this.OffsetDistanceSliderDragComplete(), param => true);
 			ResolutionSliderDragCompleteCommand = new RelayCommand(param => this.ResolutionSliderDragComplete(), param => true);
+			MoldTypeSliderDragCompleteCommand = new RelayCommand(param => this.MoldTypeSliderDragComplete(), param => true);
 		}
 
 		public override void OnExit() {

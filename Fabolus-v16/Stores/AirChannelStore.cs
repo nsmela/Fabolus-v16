@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using HelixToolkit.Wpf;
+using System.Linq;
 
 namespace Fabolus_v16.Stores {
 	public class AirChannelStore {
@@ -59,6 +60,8 @@ namespace Fabolus_v16.Stores {
 			_airChannels.Clear();
 			OnAirChannelsChanged();
 		}
+
+		public double LowestAirChannel { get => _airChannels.Any() ? _airChannels.Min(airchannel => airchannel.Anchor.Z) : -1000; }
 
 		#region Preview Airhole
 		private Point3D _previewPoint;

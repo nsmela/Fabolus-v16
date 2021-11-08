@@ -72,6 +72,7 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		#region Events and Property Changes
 		private void OnCurrentBolusChanged() {
 			OnPropertyChanged(nameof(BolusMesh));
+			ClearAirChannels();
 		}
 		private void OnAirChannelsChanged() {
 			OnPropertyChanged(nameof(AirChannelMesh));
@@ -203,10 +204,17 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		//dependancy object for view to display the mesh
 		//includes a check if it should be visible
 		public GeometryModel3D MoldMesh {
-			get => _bolusStore.MoldModel3D;
+			get {
+				if (_bolusStore.PreviewMoldVisibility)
+					return _bolusStore.MoldModel3D;
+
+				return null;
+			}
 		}
 
-
+		public void SetLowestAirChannelPoint(double z) {
+			_bolusStore.LowestAirChannelPoint = z;
+		}
 		#endregion
 
 		#region Extending Access to the viewport to allow mouse events to be handled

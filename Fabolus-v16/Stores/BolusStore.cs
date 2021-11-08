@@ -26,6 +26,8 @@ namespace Fabolus_v16.Stores {
 				_bolus = value;
 				_smoothedBolus = null;
 				_moldBolus = null;
+				PreviewMoldVisibility = false;
+				ClearBolusTransforms();
 				OnCurrentBolusChanged();
 			}
 		}
@@ -42,6 +44,9 @@ namespace Fabolus_v16.Stores {
 			CurrentBolusChanged?.Invoke();
 		}
 		private void OnMoldChanged() {
+			if (CurrentBolus != null && _previewMold)
+				GenerateMold();
+
 			MoldChanged?.Invoke();
 		}
 
@@ -181,82 +186,52 @@ namespace Fabolus_v16.Stores {
 		private float _moldOpacity = 0.3f;
 		private Color _moldColor = Colors.Violet;
 		private MoldTypes _moldType = MoldTypes.contoured;
+		private GeometryModel3D _moldMesh;
+		private double _lowest_airchannel_point;
 
-		public bool PreviewMoldVisibility { set { _previewMold = value;	OnMoldChanged(); } }
+		public bool PreviewMoldVisibility { get => _previewMold; set { _previewMold = value; OnMoldChanged(); } }
 		public double MoldOffset { get => _moldOffset;  set { _moldOffset = value; OnMoldChanged(); } }
 		public int MoldResolution { get => _moldResolution; set { _moldResolution = value; OnMoldChanged(); } }
 		public float MoldOpacity { get => _moldOpacity; set { _moldOpacity = value; OnMoldChanged(); } }
 		public Color MoldColor { get => _moldColor; set { _moldColor = value; OnMoldChanged(); } }
 		public MoldTypes MoldType { get => _moldType; set { _moldType = value; OnMoldChanged(); } }
+		public double LowestAirChannelPoint { set { _lowest_airchannel_point = value; OnMoldChanged(); } }
 
-		public GeometryModel3D MoldModel3D {
-			get {
-				if (CurrentBolus == null ||
-					!_previewMold)
-					return null;
+		public GeometryModel3D MoldModel3D { get => _moldMesh; }
 
-				//apply transform
-				DMesh3 rotated_mesh = ApplyBolusRotation(CurrentBolus.DMesh);
+		private void GenerateMold() {
+			if (CurrentBolus == null ||
+			!_previewMold)
+				return;
 
-				var mesh = BolusTools.GenerateMold(rotated_mesh, _moldOffset, _moldResolution);
-				DiffuseMaterial material = new(new SolidColorBrush(_moldColor));
-				material.Brush.Opacity = _moldOpacity;
-				return new GeometryModel3D(BolusTools.DMeshToMeshGeometry(mesh), material) { BackMaterial = material };
-			}
-		}
-
-		private DMesh3 GenerateMold(DMesh3 mesh) {
+			DMesh3 rotated_mesh = ApplyBolusRotation(CurrentBolus.DMesh);
 			DMesh3 result = new DMesh3();
 
 			switch (_moldType) {
 
 				case MoldTypes.box:
+					result = BolusTools.GenerateBoxMold(rotated_mesh, MoldOffset, MoldResolution);
 					break;
 				case MoldTypes.contoured:
+					result = BolusTools.GenerateContourMold(rotated_mesh, _moldOffset, _moldResolution);
 					break;
 				case MoldTypes.flatbottom:
+					result = BolusTools.GenerateFlattenedContourMold(rotated_mesh, _moldOffset, _moldResolution);
 					break;
-						case MoldTypes.flattop:
+				case MoldTypes.flattop:
+					result = BolusTools.GenerateRaisedContourMold(rotated_mesh, _moldOffset, _moldResolution, _lowest_airchannel_point);
 					break;
 				default:
+					result = BolusTools.GenerateMold(rotated_mesh, _moldOffset, _moldResolution);
 					break;
 
 			}
 
-			return result;
+			DiffuseMaterial material = new(new SolidColorBrush(_moldColor));
+			material.Brush.Opacity = _moldOpacity;
+			_moldMesh = new GeometryModel3D(BolusTools.DMeshToMeshGeometry(result), material) { BackMaterial = material };
+
 		}
-
-
-
-
-
-
-
-
-
-		/*
-		public void GenerateMold() {
-			if (MoldViewModel.Instance.AirChannelMesh == null)
-				return;
-
-			var airChannelMesh = BolusTools.MeshGeometryToDMesh(MoldViewModel.Instance.AirChannelMesh);
-			DMesh3 cavityMesh = BolusTools.MeshGeometryToDMesh(CurrentBolus.MeshGeometry, TransformGroup.Value);
-
-			if (airChannelMesh.TriangleCount > 0) //boolean union will fail if either mesh is null
-				cavityMesh = BolusTools.BooleanUnion(cavityMesh, airChannelMesh);
-
-			var contourGeometry = BolusTools.GenerateBolusMold(CurrentBolus.MeshGeometry, MoldSize, TransformGroup.Value);
-			var contourMesh = BolusTools.MeshGeometryToDMesh(contourGeometry);
-			var mold = BolusTools.BooleanSubtraction(contourMesh, cavityMesh);
-
-			if (mold.TriangleCount < 1)
-				return;
-
-			MoldViewModel.Instance.ShowMold = false;
-
-			BolusMold = new Bolus(mold);
-			OnCurrentBolusChanged();
-		}*/
 
 		#endregion
 	}

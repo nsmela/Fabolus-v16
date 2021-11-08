@@ -63,7 +63,7 @@
                         FontSize="12" 
                         FontWeight="Bold"
                         FontFamily="\Fonts\#Poppins"/>
-        <Slider 
+        <Slider Value="{Binding MoldShape, Mode=TwoWay}"
                         x:Name="moldTypeSlider"
                         Style="{DynamicResource SliderStyle1}"
                         Minimum="0" 
@@ -71,11 +71,9 @@
                         TickFrequency="1" 
                         TickPlacement="TopLeft" 
                         IsSnapToTickEnabled="True" 
-                        Height="30"/>
+                        Height="30"
+                        b:SliderExtension.DragCompletedCommand="{Binding MoldTypeSliderDragCompleteCommand}"  />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" >
-            <ToggleButton >
-                <iconPacks:MaterialDesign Width="30" Height="30" Kind="DonutLarge" />
-            </ToggleButton>
         </StackPanel>
         
         <Button Content="generate" 
