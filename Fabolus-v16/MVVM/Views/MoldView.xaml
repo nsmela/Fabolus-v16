@@ -7,6 +7,7 @@
              xmlns:local="clr-namespace:Fabolus_v16.MVVM.Views"
              xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:b="clr-namespace:Fabolus_v16.Behaviors"
              d:DataContext="{d:DesignInstance Type=viewModels:MoldViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="520" d:DesignWidth="200" 
@@ -35,7 +36,8 @@
                         AutoToolTipPlacement="BottomRight"
                         AutoToolTipPrecision="1"
                         IsSnapToTickEnabled="True" 
-                        Height="30"/>
+                        Height="30"
+                        b:SliderExtension.DragCompletedCommand="{Binding OffsetDistanceSliderDragCompleteCommand}"  />
         <Label Content="mold resolution" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"
@@ -45,14 +47,14 @@
                         FontWeight="Bold"
                         FontFamily="\Fonts\#Poppins"/>
         <Slider Value="{Binding Resolution, Mode=TwoWay}"
-                        Minimum="16" 
-                        Maximum="256" 
-                        Ticks="16, 32, 64, 96, 128, 192, 256"
+                        Minimum="64" 
+                        Maximum="192" 
+                        Ticks="64, 96, 128, 160, 192"
                         TickPlacement="TopLeft" 
                         AutoToolTipPlacement="BottomRight"
-                        AutoToolTipPrecision="0"
                         IsSnapToTickEnabled="True" 
-                        Height="30"/>
+                        Height="30"
+                        b:SliderExtension.DragCompletedCommand="{Binding ResolutionSliderDragCompleteCommand}"  />
         <Label Content="{Binding Path=Value, ElementName=moldTypeSlider, Converter={StaticResource moldTypeEnumToStringConverter}}" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"

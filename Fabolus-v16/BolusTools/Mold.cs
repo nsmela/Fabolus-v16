@@ -24,15 +24,23 @@ namespace Fabolus_v16 {
          * flattop: going bottom-to-top, save the previous layer's shape and start at a specific height
          * contour: do not voxilize
          */
-        public static DMesh3 GenerateMold(DMesh3 mesh, double offset, double airholeLevel = -1000) {
-            //generate offset mesh
-            var offsetMold = OffsetMesh(mesh, offset);
+		public static DMesh3 GenerateMold(DMesh3 mesh, double offset, int resolution = 64, double airholeLevel = -1000) {
+			//generate offset mesh
+			var offsetMold = OffsetMesh(mesh, offset, resolution);
 
-            return VoxilizedMold(offsetMold, airholeLevel);
-        }
+			return VoxilizedMold(offsetMold, airholeLevel, resolution);
+		}
 
-        static DMesh3 VoxilizedMold(DMesh3 mesh, double airholeLevel) {
-            int numcells = 64;
+		public static DMesh3 GenerateContourMold(DMesh3 mesh, double offset, int resolution = 64) {
+			var offsetMold = OffsetMesh(mesh, offset, resolution);
+
+			//bitmap use to define how the mesh voxilization goes
+			Bitmap3 bmp = MeshBitmap(mesh, resolution);
+
+			return null;
+		}
+
+		static DMesh3 VoxilizedMold(DMesh3 mesh, double airholeLevel, int numcells) {
 
             int airhole_z_height = Convert.ToInt32((mesh.CachedBounds.Height / numcells) * airholeLevel);
 
@@ -135,6 +143,10 @@ namespace Fabolus_v16 {
 			*/
 		}
 
+		static Bitmap3 BitmapBox(Bitmap3 bmp) {
+			return bmp;
+		}
+
 		static DMesh3 MarchingCubesSmoothing(DMesh3 mesh, int numcells) {
 			double cell_size = mesh.CachedBounds.MaxDim / (numcells / 4);
 
@@ -151,6 +163,22 @@ namespace Fabolus_v16 {
 
 			c.Generate();
 			return c.Mesh;
+		}
+
+		static Bitmap3 MeshBitmap(DMesh3 mesh, int numcells) {
+			//create voxel mesh
+			DMeshAABBTree3 spatial = new DMeshAABBTree3(mesh, autoBuild: true);
+			AxisAlignedBox3d bounds = mesh.CachedBounds;
+
+			double cellsize = bounds.MaxDim / numcells;
+			ShiftGridIndexer3 indexer = new ShiftGridIndexer3(bounds.Min, cellsize);
+
+			Bitmap3 bmp = new Bitmap3(new Vector3i(numcells, numcells, numcells));
+			foreach (Vector3i idx in bmp.Indices()) {
+				Vector3d v = indexer.FromGrid(idx);
+				bmp.Set(idx, spatial.IsInside(v));
+			}
+			return bmp;
 		}
 	}
 }

@@ -24,7 +24,8 @@
                 Value="{Binding XAxisRotation, Mode=TwoWay}"
                 Template="{StaticResource xAxisRotationSliderTheme}"
                 b:SliderExtension.DragCompletedCommand="{Binding SaveRotationCommand}" 
-                Margin="2"/>
+                Margin="2">
+        </Slider>
         <Label Content="y axis" 
                 HorizontalAlignment="Center" 
                 VerticalAlignment="Center"

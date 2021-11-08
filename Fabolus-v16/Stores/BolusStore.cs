@@ -180,7 +180,7 @@ namespace Fabolus_v16.Stores {
 		private int _moldResolution = 64;
 		private float _moldOpacity = 0.3f;
 		private Color _moldColor = Colors.Violet;
-		private MoldTypes _moldType = 0;
+		private MoldTypes _moldType = MoldTypes.contoured;
 
 		public bool PreviewMoldVisibility { set { _previewMold = value;	OnMoldChanged(); } }
 		public double MoldOffset { get => _moldOffset;  set { _moldOffset = value; OnMoldChanged(); } }
@@ -198,14 +198,33 @@ namespace Fabolus_v16.Stores {
 				//apply transform
 				DMesh3 rotated_mesh = ApplyBolusRotation(CurrentBolus.DMesh);
 
-				var mesh = BolusTools.GenerateMold(rotated_mesh, _moldOffset);
+				var mesh = BolusTools.GenerateMold(rotated_mesh, _moldOffset, _moldResolution);
 				DiffuseMaterial material = new(new SolidColorBrush(_moldColor));
 				material.Brush.Opacity = _moldOpacity;
 				return new GeometryModel3D(BolusTools.DMeshToMeshGeometry(mesh), material) { BackMaterial = material };
 			}
 		}
 
-		
+		private DMesh3 GenerateMold(DMesh3 mesh) {
+			DMesh3 result = new DMesh3();
+
+			switch (_moldType) {
+
+				case MoldTypes.box:
+					break;
+				case MoldTypes.contoured:
+					break;
+				case MoldTypes.flatbottom:
+					break;
+						case MoldTypes.flattop:
+					break;
+				default:
+					break;
+
+			}
+
+			return result;
+		}
 
 
 
