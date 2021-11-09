@@ -31,7 +31,7 @@ namespace Fabolus_v16.Stores {
 		public float Opacity { get => _opacity; set => _opacity = value; }
 		public int Count { get => _airChannels.Count; }
 		public bool Visibility { get => _visibility; set => _visibility = value; }
-
+		public List<AirChannel> AirChannels { get => _airChannels; }
 		public GeometryModel3D AirChannelsMesh {
 			get {
 				MeshBuilder mesh = new MeshBuilder(true);

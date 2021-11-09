@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Media.Media3D;
 using Fabolus_v16.MVVM.Models;
 using g3;
+using gs;
 using HelixToolkit.Wpf;
 
 namespace Fabolus_v16 {
@@ -44,6 +45,7 @@ namespace Fabolus_v16 {
 			voxGen.Generate();
 			var result = new DMesh3(MarchingCubesSmoothing(voxGen.Meshes[0], resolution));
 			CentreMesh(result, offsetMold);
+			ScaleMesh(result, mesh, offset);
 
 			return result;
 		}
@@ -105,10 +107,35 @@ namespace Fabolus_v16 {
 			voxGen.Generate();
 			var result = new DMesh3(MarchingCubesSmoothing(voxGen.Meshes[0], resolution));
 			CentreMesh(result, offsetMold);
-
+			ScaleMesh(result, mesh, offset);
 			return result;
 		}
 
+		public static DMesh3 GenerateFinalMold(DMesh3 previewMold, DMesh3 bolus, List<AirChannel> airChannels) {
+			//invert bolus normals and append it to the preview mold
+			
+			DMesh3 invertedBolus = new DMesh3(bolus);
+			List<int> triangles = new List<int>();
+			for (int i = 0; i < invertedBolus.TriangleCount; i++) triangles.Add(i);
+			MeshEditor n = new MeshEditor(invertedBolus);
+			n.ReverseTriangles(triangles, true);
+			n.AppendMesh(previewMold);
+			DMesh3 mold = n.Mesh; 
+
+			if (airChannels.Count < 1)
+				return mold;
+
+			//convert airchannels to DMesh3
+			DMesh3 channels = new DMesh3();
+			MeshEditor a = new MeshEditor(channels);
+			foreach (var airhole in airChannels) {
+				a.AppendMesh(MeshGeometryToDMesh(airhole.Mesh));
+			}
+			DMesh3 tubes = new DMesh3(channels);
+
+			//boolean subtract airchannels from mold+bolus mesh
+			return new DMesh3(BolusTools.BooleanSubtraction(mold, tubes));
+		}
 		static DMesh3 VoxilizedMold(DMesh3 mesh, double airholeLevel, int numcells) {
 
             int airhole_z_height = Convert.ToInt32((mesh.CachedBounds.Height / numcells) * airholeLevel);
@@ -292,6 +319,26 @@ namespace Fabolus_v16 {
 			double y = originalMesh.CachedBounds.Center.y - mesh.CachedBounds.Center.y;
 			double z = originalMesh.CachedBounds.Center.z - mesh.CachedBounds.Center.z;
 			MeshTransforms.Translate(mesh, x, y, z);
+		}
+
+		static void ScaleMesh(DMesh3 mesh, DMesh3 originalMesh, double offset) {
+			//distance to have offset mesh match
+			double x = (originalMesh.CachedBounds.Max.x - originalMesh.CachedBounds.Min.x) + (offset * 2);
+			double y = (originalMesh.CachedBounds.Max.y - originalMesh.CachedBounds.Min.y) + (offset * 2);
+			double z = (originalMesh.CachedBounds.Max.z - originalMesh.CachedBounds.Min.z) + (offset * 2);
+
+			//new offset mesh's distance
+			double newX = (mesh.CachedBounds.Max.x - mesh.CachedBounds.Min.x);
+			double newY = (mesh.CachedBounds.Max.y - mesh.CachedBounds.Min.y);
+			double newZ = (mesh.CachedBounds.Max.z - mesh.CachedBounds.Min.z);
+
+			//scaling
+			Vector3d scale = new Vector3d();
+			scale.x = x / newX;
+			scale.y = y / newY;
+			scale.z = z / newZ;
+
+			MeshTransforms.Scale(mesh, scale, Vector3d.Zero);
 		}
 
 		static DMesh3 MarchingCubesSmoothing(DMesh3 mesh, int numcells) {

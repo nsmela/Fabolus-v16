@@ -24,7 +24,7 @@ namespace Fabolus_v16 {
             c.Bounds.Expand(3 * c.CubeSize);
             c.Generate();
             MeshNormals.QuickCompute(c.Mesh);
-
+            
             //int triangleCount = c.Mesh.TriangleCount / 2;
             //Reducer r = new Reducer(c.Mesh);
             //r.ReduceToTriangleCount(triangleCount);
@@ -44,14 +44,10 @@ namespace Fabolus_v16 {
             c.RootMode = MarchingCubes.RootfindingModes.LerpSteps;
             c.RootModeSteps = 5;
             c.Bounds = mesh.Bounds();
-            c.CubeSize = c.Bounds.MaxDim / 128;
+            c.CubeSize = 1.0f; //c.Bounds.MaxDim / 64;
             c.Bounds.Expand(3 * c.CubeSize);
             c.Generate();
-            MeshNormals.QuickCompute(c.Mesh);
 
-            //int triangleCount = c.Mesh.TriangleCount / 2;
-            //Reducer r = new Reducer(c.Mesh);
-            //r.ReduceToTriangleCount(triangleCount);
             return c.Mesh;
         }
 

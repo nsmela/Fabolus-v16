@@ -15,5 +15,13 @@ namespace Fabolus_v16 {
             MeshTransforms.Translate(mesh, x, y, z);
             return mesh;
         }
-    }
+
+		static void ScaleMesh(DMesh3 mesh, double scaleX, double scaleY, double scaleZ) {
+			Vector3d scale = new Vector3d(
+				scaleX,
+				scaleY,
+				scaleZ);
+			MeshTransforms.Scale(mesh, scale, Vector3d.Zero);
+		}
+	}
 }

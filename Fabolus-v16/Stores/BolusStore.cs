@@ -17,6 +17,9 @@ namespace Fabolus_v16.Stores {
 
 		public Bolus CurrentBolus {
 			get {
+				if (_moldBolus != null)
+					return _moldBolus;
+
 				if (_smoothedBolus != null)
 					return _smoothedBolus;
 
@@ -34,24 +37,41 @@ namespace Fabolus_v16.Stores {
 
 		public Bolus BolusRaw { get => _bolus; set => CurrentBolus = value; }
 		public Bolus BolusSmoothed { get => _smoothedBolus; set { _smoothedBolus = value; _moldBolus = null; OnCurrentBolusChanged(); } }
-		public Bolus BolusMold { get => _moldBolus; set { _moldBolus = value; OnCurrentBolusChanged(); } }
+		public Bolus BolusMold { get => _moldBolus; set { _moldBolus = value; OnMoldFinalChanged(); } }
 
 		public event Action CurrentBolusChanged;
-		public event Action MoldChanged;
+		public event Action MoldPreviewChanged;
+		public event Action MoldFinalChanged;
 		public event Action BolusRotate;
+		public event Action MoldScaleChanged;
 
 		private void OnCurrentBolusChanged() {
 			CurrentBolusChanged?.Invoke();
 		}
-		private void OnMoldChanged() {
+		private void OnMoldPreviewChanged() {
 			if (CurrentBolus != null && _previewMold)
-				GenerateMold();
+				GeneratePreviewMold();
 
-			MoldChanged?.Invoke();
+			MoldPreviewChanged?.Invoke();
+		}
+
+		private void OnMoldFinalChanged() {
+			if (_moldBolus != null)
+				PreviewMoldVisibility = false;
+
+			MoldFinalChanged?.Invoke();
+			CurrentBolusChanged?.Invoke();
 		}
 
 		private void OnBolusRotate() {
 			BolusRotate?.Invoke();
+		}
+
+		private void OnMoldScaleChanged() {
+			BolusMold = null;
+			GeneratePreviewMold();
+			MoldPreviewChanged();
+			MoldScaleChanged?.Invoke();
 		}
 
 		public String BolusVolume {
@@ -83,6 +103,14 @@ namespace Fabolus_v16.Stores {
 			}
 		}
 
+		public Model3DGroup BolusMoldModel3D {
+			get {
+				Model3DGroup meshes = new Model3DGroup();
+				meshes.Children.Add(MeshToGeometry(BolusMold.MeshGeometry, Colors.Red, 0.6f, false));
+				return meshes;
+			}
+		}
+
 		private GeometryModel3D BolusModelGeometry3D { get => MeshToGeometry(CurrentBolus.MeshGeometry, _meshColor, _bolusOpacity); }
 
 		private GeometryModel3D MeshToGeometry(MeshGeometry3D mesh, Color color, float opacity, bool transforms = true) {
@@ -93,8 +121,11 @@ namespace Fabolus_v16.Stores {
 			//transforms
 			Transform3DGroup transformGroup = TransformGroup;
 			transformGroup.Children.Add(new RotateTransform3D(_tempRotation)); //from bolusStore
+
 			var result = new GeometryModel3D(mesh, skin);
-			result.BackMaterial = skin;
+			var backSkin = new DiffuseMaterial(new SolidColorBrush(color));
+			backSkin.Brush.Opacity = 1.0f;
+			result.BackMaterial = backSkin;
 
 			if (transforms) result.Transform = transformGroup;
 			
@@ -117,7 +148,7 @@ namespace Fabolus_v16.Stores {
 				Vector3D reference = transformGroup.Transform(new Vector3D(0, 0, -1));
 				reference.Negate();
 				var mesh = CurrentBolus.OverhangMesh(transformGroup, 60f);
-				return MeshToGeometry(mesh, Colors.Yellow, 0.9f);
+				return MeshToGeometry(mesh, Colors.Yellow, 0.8f);
 			}
 		}
 
@@ -167,7 +198,7 @@ namespace Fabolus_v16.Stores {
 
 			OnBolusRotate();
 			OnCurrentBolusChanged();
-			OnMoldChanged();
+			OnMoldPreviewChanged();
 		}
 
 		#endregion
@@ -181,28 +212,47 @@ namespace Fabolus_v16.Stores {
 		 * any change clears generated mesh and creates preview mesh
 		 */
 		private bool _previewMold = false;
-		private double _moldOffset = 2.5f;
+		private double _moldOffset = 3.5f;
 		private int _moldResolution = 64;
-		private float _moldOpacity = 0.3f;
+		private float _moldOpacity = 0.4f;
 		private Color _moldColor = Colors.Violet;
-		private MoldTypes _moldType = MoldTypes.contoured;
+		private MoldTypes _moldType = MoldTypes.flattop;
 		private GeometryModel3D _moldMesh;
+		private DMesh3 _previewMoldMesh;
 		private double _lowest_airchannel_point;
 
-		public bool PreviewMoldVisibility { get => _previewMold; set { _previewMold = value; OnMoldChanged(); } }
-		public double MoldOffset { get => _moldOffset;  set { _moldOffset = value; OnMoldChanged(); } }
-		public int MoldResolution { get => _moldResolution; set { _moldResolution = value; OnMoldChanged(); } }
-		public float MoldOpacity { get => _moldOpacity; set { _moldOpacity = value; OnMoldChanged(); } }
-		public Color MoldColor { get => _moldColor; set { _moldColor = value; OnMoldChanged(); } }
-		public MoldTypes MoldType { get => _moldType; set { _moldType = value; OnMoldChanged(); } }
-		public double LowestAirChannelPoint { set { _lowest_airchannel_point = value; OnMoldChanged(); } }
+		private double _moldScaleX = 1.0f;
+		private double _moldScaleY = 1.0f;
+		private double _moldScaleZ = 1.0f;
+
+		private double _moldTranslateX = 0f;
+		private double _moldTranslateY = 0f;
+		private double _moldTranslateZ = 0f;
+
+		public bool PreviewMoldVisibility { get => _previewMold; set { _previewMold = value; OnMoldPreviewChanged(); } }
+		public double MoldOffset { get => _moldOffset;  set { _moldOffset = value; _previewMold = true;  OnMoldPreviewChanged(); } }
+		public int MoldResolution { get => _moldResolution; set { _moldResolution = value; _previewMold = true; OnMoldPreviewChanged(); } }
+		public float MoldOpacity { get => _moldOpacity; set { _moldOpacity = value; _previewMold = true; OnMoldPreviewChanged(); } }
+		public Color MoldColor { get => _moldColor; set { _moldColor = value; _previewMold = true; OnMoldPreviewChanged(); } }
+		public MoldTypes MoldType { get => _moldType; set { _moldType = value; _previewMold = true; OnMoldPreviewChanged(); } }
+		public double LowestAirChannelPoint { set { _lowest_airchannel_point = value; OnMoldPreviewChanged(); } }
+
+		public double MoldScaleX { get => _moldScaleX; set { _moldScaleX = value; OnMoldScaleChanged(); } }
+		public double MoldScaleY { get => _moldScaleY; set { _moldScaleY = value; OnMoldScaleChanged(); } }
+		public double MoldScaleZ { get => _moldScaleZ; set { _moldScaleZ = value; OnMoldScaleChanged(); } }
+
+		public double MoldTranslateX { get => _moldTranslateX; set { _moldTranslateX = value; OnMoldScaleChanged(); } }
+		public double MoldTranslateY { get => _moldTranslateY; set { _moldTranslateY = value; OnMoldScaleChanged(); } }
+		public double MoldTranslateZ { get => _moldTranslateZ; set { _moldTranslateZ = value; OnMoldScaleChanged(); } }
 
 		public GeometryModel3D MoldModel3D { get => _moldMesh; }
 
-		private void GenerateMold() {
+		private void GeneratePreviewMold() {
 			if (CurrentBolus == null ||
 			!_previewMold)
 				return;
+
+			BolusMold = null;
 
 			DMesh3 rotated_mesh = ApplyBolusRotation(CurrentBolus.DMesh);
 			DMesh3 result = new DMesh3();
@@ -226,11 +276,30 @@ namespace Fabolus_v16.Stores {
 					break;
 
 			}
+			MeshTransforms.Scale(result, _moldScaleX, _moldScaleY, _moldScaleZ);
+			MeshTransforms.Translate(result, _moldTranslateX, _moldTranslateY, _moldTranslateZ);
 
+			_previewMoldMesh = result;
 			DiffuseMaterial material = new(new SolidColorBrush(_moldColor));
 			material.Brush.Opacity = _moldOpacity;
-			_moldMesh = new GeometryModel3D(BolusTools.DMeshToMeshGeometry(result), material) { BackMaterial = material };
+			_moldMesh = new GeometryModel3D(BolusTools.DMeshToMeshGeometry(_previewMoldMesh), material) { BackMaterial = material };
 
+		}
+
+		public void GenerateMold(List<AirChannel> airChannels)  {
+			if (CurrentBolus == null ||
+			!_previewMold)
+				return;
+
+			if (_previewMoldMesh == null) //create the mold if none exists
+				GeneratePreviewMold();
+
+			if (_previewMoldMesh == null) //if the mold still doesn't exist, abort
+				return;
+
+			_moldBolus = null; //clears any previously generated mold
+
+			BolusMold = new Bolus(BolusTools.GenerateFinalMold(_previewMoldMesh, ApplyBolusRotation(CurrentBolus.DMesh), airChannels));
 		}
 
 		#endregion

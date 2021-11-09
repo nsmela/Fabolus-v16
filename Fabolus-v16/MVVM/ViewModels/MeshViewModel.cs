@@ -21,12 +21,16 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		public Model3DGroup BolusMesh {
 			get {
 				if (_bolusStore != null)
-					if (_bolusStore.CurrentBolus != null)
-						return _bolusStore.BolusModel3D;
+					if (_bolusStore.CurrentBolus != null) {
+						if (_bolusStore.BolusMold != null)
+							return _bolusStore.BolusMoldModel3D;
+						else
+							return _bolusStore.BolusModel3D;
+					}
+						
 				return null;
 			}
 		}
-
 
 		public float BolusHeight {
 			get {
@@ -55,7 +59,8 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			_meshVisibility = true;
 
 			_bolusStore.CurrentBolusChanged += OnCurrentBolusChanged;
-			_bolusStore.MoldChanged += OnMoldChanged;
+			_bolusStore.MoldPreviewChanged += OnMoldChanged;
+			_bolusStore.MoldFinalChanged += OnMoldFinalChanged;
 			_airChannelStore.AirChannelsChanged += OnAirChannelsChanged;
 			_airChannelStore.PreviewChannelChanged += OnPreviewAirChannelChanged;
 
@@ -63,7 +68,8 @@ namespace Fabolus_v16.MVVM.ViewModels {
 
 		public override void OnExit() {
 			_bolusStore.CurrentBolusChanged -= OnCurrentBolusChanged;
-			_bolusStore.MoldChanged -= OnMoldChanged;
+			_bolusStore.MoldPreviewChanged -= OnMoldChanged;
+			_bolusStore.MoldFinalChanged -= OnMoldFinalChanged;
 
 			_airChannelStore.AirChannelsChanged -= OnAirChannelsChanged;
 			_airChannelStore.PreviewChannelChanged -= OnPreviewAirChannelChanged;
@@ -72,7 +78,6 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		#region Events and Property Changes
 		private void OnCurrentBolusChanged() {
 			OnPropertyChanged(nameof(BolusMesh));
-			ClearAirChannels();
 		}
 		private void OnAirChannelsChanged() {
 			OnPropertyChanged(nameof(AirChannelMesh));
@@ -86,6 +91,10 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		}
 		private void OnMoldChanged() {
 			OnPropertyChanged(nameof(MoldMesh));
+		}
+
+		private void OnMoldFinalChanged() {
+			OnPropertyChanged(nameof(AirChannelMesh));
 		}
 
 		#endregion
@@ -179,7 +188,9 @@ namespace Fabolus_v16.MVVM.ViewModels {
 
 		public GeometryModel3D AirChannelMesh {
 			get {
-				if (AirChannels.Count < 1 || !_meshVisibility)
+				if (AirChannels.Count < 1 
+					|| !_meshVisibility
+					|| _bolusStore.BolusMold != null)
 					return null;
 
 				return AirChannels.AirChannelsMesh;

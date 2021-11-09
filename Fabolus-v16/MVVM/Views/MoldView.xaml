@@ -73,7 +73,124 @@
                         IsSnapToTickEnabled="True" 
                         Height="30"
                         b:SliderExtension.DragCompletedCommand="{Binding MoldTypeSliderDragCompleteCommand}"  />
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" >
+
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" >
+            <Label Content="x scale" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center"
+                        Height="22"
+                        Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                        FontSize="12" 
+                        FontWeight="Bold"
+                        FontFamily="\Fonts\#Poppins"/>
+            <Slider Value="{Binding ScaleX, Mode=TwoWay}"
+                        Minimum="0.9" 
+                        Maximum="1.1"
+                        TickFrequency="0.01"
+                        TickPlacement="TopLeft" 
+                        AutoToolTipPlacement="BottomRight"
+                        AutoToolTipPrecision="2"
+                        IsSnapToTickEnabled="True" 
+                        Height="24"
+                        b:SliderExtension.DragCompletedCommand="{Binding ScaleXSliderDragCompleteCommand}"  />
+            <Label Content="y scale" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center"
+                   Height="22"
+                        Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                        FontSize="12" 
+                        FontWeight="Bold"
+                        FontFamily="\Fonts\#Poppins"/>
+            <Slider Value="{Binding ScaleY, Mode=TwoWay}"
+                        Minimum="0.9" 
+                        Maximum="1.1"
+                        TickFrequency="0.01"
+                        TickPlacement="TopLeft" 
+                        AutoToolTipPlacement="BottomRight"
+                        AutoToolTipPrecision="2"
+                        IsSnapToTickEnabled="True" 
+                        Height="24"
+                        b:SliderExtension.DragCompletedCommand="{Binding ScaleYSliderDragCompleteCommand}"  />
+            <Label Content="z scale" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center"
+                   Height="22"
+                        Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                        FontSize="12" 
+                        FontWeight="Bold"
+                        FontFamily="\Fonts\#Poppins"/>
+            <Slider Value="{Binding ScaleZ, Mode=TwoWay}"
+                        Minimum="0.9" 
+                        Maximum="1.1"
+                        TickFrequency="0.01"
+                        TickPlacement="TopLeft" 
+                        AutoToolTipPlacement="BottomRight"
+                        AutoToolTipPrecision="2"
+                        IsSnapToTickEnabled="True" 
+                        Height="24"
+                        b:SliderExtension.DragCompletedCommand="{Binding ScaleZSliderDragCompleteCommand}"  />
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" >
+            <Label Content="x translate" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center"
+                        Height="22"
+                        Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                        FontSize="12" 
+                        FontWeight="Bold"
+                        FontFamily="\Fonts\#Poppins"/>
+            <Slider Value="{Binding TranslateX, Mode=TwoWay}"
+                        Minimum="-10" 
+                        Maximum="10"
+                        TickFrequency="1"
+                        TickPlacement="TopLeft" 
+                        AutoToolTipPlacement="BottomRight"
+                        IsSnapToTickEnabled="True" 
+                        Height="24"
+                        b:SliderExtension.DragCompletedCommand="{Binding TranslateXSliderDragCompleteCommand}"  />
+            <Label Content="y translate" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center"
+                   Height="22"
+                        Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                        FontSize="12" 
+                        FontWeight="Bold"
+                        FontFamily="\Fonts\#Poppins"/>
+            <Slider Value="{Binding TranslateY, Mode=TwoWay}"
+                        Minimum="-10" 
+                        Maximum="10"
+                        TickFrequency="1"
+                        TickPlacement="TopLeft" 
+                        AutoToolTipPlacement="BottomRight"
+                        AutoToolTipPrecision="2"
+                        IsSnapToTickEnabled="True" 
+                        Height="24"
+                        b:SliderExtension.DragCompletedCommand="{Binding TranslateYSliderDragCompleteCommand}"  />
+            <Label Content="z translate" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center"
+                   Height="22"
+                        Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                        FontSize="12" 
+                        FontWeight="Bold"
+                        FontFamily="\Fonts\#Poppins"/>
+            <Slider Value="{Binding TranslateZ, Mode=TwoWay}"
+                        Minimum="-10" 
+                        Maximum="10"
+                        TickFrequency="1"
+                        TickPlacement="TopLeft" 
+                        AutoToolTipPlacement="BottomRight"
+                        AutoToolTipPrecision="2"
+                        IsSnapToTickEnabled="True" 
+                        Height="24"
+                        b:SliderExtension.DragCompletedCommand="{Binding TranslateZSliderDragCompleteCommand}"  />
         </StackPanel>
         
         <Button Content="generate" 
@@ -84,6 +201,6 @@
                 FontWeight="Bold"
                 FontFamily="\Fonts\#Poppins"
                 Margin="0,4,0,4"
-                Command="" />
+                Command="{Binding GenerateMoldCommand}" />
     </StackPanel>
 </UserControl>

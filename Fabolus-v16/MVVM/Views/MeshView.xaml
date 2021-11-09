@@ -16,6 +16,7 @@
         <!-- Mesh View -->
         <h:HelixViewport3D Grid.Row="1" Grid.Column="1" 
                            ZoomExtentsWhenLoaded="True" 
+                          
                            Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}" 
                            viewModels:MouseBehaviour.MouseDownCommand="{Binding MouseDownCommand}"
                            viewModels:MouseBehaviour.MouseMoveCommand="{Binding MouseMoveCommand}">
