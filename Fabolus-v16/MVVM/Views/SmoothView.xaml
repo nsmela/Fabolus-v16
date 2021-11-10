@@ -109,7 +109,6 @@
                         IsSnapToTickEnabled="True" 
                         Height="30"/>
             </StackPanel>
-            
         </StackPanel>
 
         <Button Content="apply" 

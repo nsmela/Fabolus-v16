@@ -11,9 +11,23 @@ namespace Fabolus_v16 {
 	public static partial class BolusTools {
         public static MeshGeometry3D Smooth(double edgeLength, double smoothSpeed, double iterations, double cells, Bolus bolus) {
             DMesh3 mesh = bolus.DMesh;
-            return Smooth(edgeLength, smoothSpeed, iterations, cells, mesh);
+            return BolusTools.DMeshToMeshGeometry(Smooth(edgeLength, smoothSpeed, iterations, cells, mesh));
 		}
 
+        /// <summary>
+        /// Returns a smooth version of a bolus's mesh witha slight inflation or reduction
+        /// </summary>
+        /// <param name="edgeLength"></param>
+        /// <param name="smoothSpeed"></param>
+        /// <param name="iterations"></param>
+        /// <param name="cells"></param>
+        /// <param name="bolus"></param>
+        /// <returns></returns>
+        public static MeshGeometry3D SmoothWithOffset(double edgeLength, double smoothSpeed, double iterations, double cells, double offset, Bolus bolus) {
+            DMesh3 mesh = Smooth(edgeLength, smoothSpeed, iterations, cells, bolus.DMesh);
+            mesh = OffsetMesh(mesh, offset, 64);
+            return DMeshToMeshGeometry( mesh);
+		}
         /// <summary>
         /// uses marching cubes to help smooth the mesh after using the remesher
         /// experimental
@@ -22,7 +36,7 @@ namespace Fabolus_v16 {
         /// <param name="smoothSpeed"></param>
         /// <param name="iterations"></param>
         /// <param name="cells"></param>
-        public static MeshGeometry3D Smooth(double edgeLength, double smoothSpeed, double iterations, double cells, DMesh3 _mesh) {
+        public static DMesh3 Smooth(double edgeLength, double smoothSpeed, double iterations, double cells, DMesh3 _mesh) {
             //Use the Remesher class to do a basic remeshing
             DMesh3 mesh = new DMesh3(_mesh);
             Remesher r = new Remesher(mesh);
@@ -58,7 +72,7 @@ namespace Fabolus_v16 {
             if (_smoothMesh == null)
                 return null;
 
-            return BolusTools.DMeshToMeshGeometry(_smoothMesh);
+            return _smoothMesh;
 
         }
     }

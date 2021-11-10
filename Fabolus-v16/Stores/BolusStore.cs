@@ -30,8 +30,8 @@ namespace Fabolus_v16.Stores {
 				_smoothedBolus = null;
 				_moldBolus = null;
 				PreviewMoldVisibility = false;
+				_airChannelStore.ClearAirChannels();
 				ClearBolusTransforms();
-				OnCurrentBolusChanged();
 			}
 		}
 
@@ -39,6 +39,7 @@ namespace Fabolus_v16.Stores {
 		public Bolus BolusSmoothed { get => _smoothedBolus; set { _smoothedBolus = value; _moldBolus = null; OnCurrentBolusChanged(); } }
 		public Bolus BolusMold { get => _moldBolus; set { _moldBolus = value; OnMoldFinalChanged(); } }
 
+		#region events
 		public event Action CurrentBolusChanged;
 		public event Action MoldPreviewChanged;
 		public event Action MoldFinalChanged;
@@ -72,6 +73,13 @@ namespace Fabolus_v16.Stores {
 			GeneratePreviewMold();
 			MoldPreviewChanged();
 			MoldScaleChanged?.Invoke();
+		}
+
+		#endregion
+
+		private AirChannelStore _airChannelStore;
+		public BolusStore(AirChannelStore airChannelStore) {
+			_airChannelStore = airChannelStore;
 		}
 
 		public String BolusVolume {
@@ -212,17 +220,17 @@ namespace Fabolus_v16.Stores {
 		 * any change clears generated mesh and creates preview mesh
 		 */
 		private bool _previewMold = false;
-		private double _moldOffset = 3.5f;
+		private double _moldOffset = 4.0f;
 		private int _moldResolution = 64;
 		private float _moldOpacity = 0.4f;
 		private Color _moldColor = Colors.Violet;
-		private MoldTypes _moldType = MoldTypes.flattop;
+		private MoldTypes _moldType = MoldTypes.FLATTOP;
 		private GeometryModel3D _moldMesh;
 		private DMesh3 _previewMoldMesh;
 		private double _lowest_airchannel_point;
 
-		private double _moldScaleX = 1.0f;
-		private double _moldScaleY = 1.0f;
+		private double _moldScaleX = 0.98f;
+		private double _moldScaleY = 0.98f;
 		private double _moldScaleZ = 1.0f;
 
 		private double _moldTranslateX = 0f;
@@ -259,16 +267,16 @@ namespace Fabolus_v16.Stores {
 
 			switch (_moldType) {
 
-				case MoldTypes.box:
+				case MoldTypes.BOX:
 					result = BolusTools.GenerateBoxMold(rotated_mesh, MoldOffset, MoldResolution);
 					break;
-				case MoldTypes.contoured:
+				case MoldTypes.CONTOURED:
 					result = BolusTools.GenerateContourMold(rotated_mesh, _moldOffset, _moldResolution);
 					break;
-				case MoldTypes.flatbottom:
+				case MoldTypes.FLATBOTTOM:
 					result = BolusTools.GenerateFlattenedContourMold(rotated_mesh, _moldOffset, _moldResolution);
 					break;
-				case MoldTypes.flattop:
+				case MoldTypes.FLATTOP:
 					result = BolusTools.GenerateRaisedContourMold(rotated_mesh, _moldOffset, _moldResolution, _lowest_airchannel_point);
 					break;
 				default:
@@ -276,8 +284,8 @@ namespace Fabolus_v16.Stores {
 					break;
 
 			}
+
 			MeshTransforms.Scale(result, _moldScaleX, _moldScaleY, _moldScaleZ);
-			MeshTransforms.Translate(result, _moldTranslateX, _moldTranslateY, _moldTranslateZ);
 
 			_previewMoldMesh = result;
 			DiffuseMaterial material = new(new SolidColorBrush(_moldColor));

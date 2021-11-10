@@ -49,8 +49,8 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		#endregion
 
 		public MainViewModel() {
-			_bolusStore = new BolusStore();
 			_airChannelStore = new AirChannelStore();
+			_bolusStore = new BolusStore(_airChannelStore);
 
 			_navigationStore = new NavigationStore();
 			_navigationStore.CurrentViewModel = new LoadFileViewModel(this);

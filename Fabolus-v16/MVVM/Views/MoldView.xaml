@@ -66,15 +66,30 @@
         <Slider Value="{Binding MoldShape, Mode=TwoWay}"
                         x:Name="moldTypeSlider"
                         Style="{DynamicResource SliderStyle1}"
-                        Minimum="0" 
-                        Maximum="3" 
+                        Minimum="1" 
+                        Maximum="4" 
                         TickFrequency="1" 
                         TickPlacement="TopLeft" 
                         IsSnapToTickEnabled="True" 
                         Height="30"
                         b:SliderExtension.DragCompletedCommand="{Binding MoldTypeSliderDragCompleteCommand}"  />
+        <!-- <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Height="30">
+            <Label Content="mold type: " 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                        FontSize="12" 
+                        FontWeight="Bold"
+                        FontFamily="\Fonts\#Poppins"/>
+            <mah:DropDownButton  ItemsSource="{Binding Path=MoldShapes, Converter={StaticResource moldTypeEnumToStringConverter}}"
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Center" 
+                Width="100" 
+                Margin="20,0,0,0"/>
+        </StackPanel> -->
 
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" >
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Visibility="Collapsed">
             <Label Content="x scale" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"
@@ -134,7 +149,7 @@
                         b:SliderExtension.DragCompletedCommand="{Binding ScaleZSliderDragCompleteCommand}"  />
         </StackPanel>
 
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" >
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Visibility="Collapsed">
             <Label Content="x translate" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"

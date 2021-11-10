@@ -2,6 +2,7 @@
 using Fabolus_v16.Stores;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,15 +13,23 @@ namespace Fabolus_v16.MVVM.ViewModels {
 
 	#region Mold Type Enumerator
 	public enum MoldTypes {
-		box,
-		flatbottom,
-		flattop,
-		contoured
+		[Description("")] NOT_SET,
+		[Description("Uniform Box")] BOX,
+		[Description("Flatten Bottom")] FLATBOTTOM,
+		[Description("Flatten Top")] FLATTOP,
+		[Description("Contour")] CONTOURED
 	}
 
 	public class MoldTypeEnumToIntValueConverter : IValueConverter {
 		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
 			MoldTypes mold = (MoldTypes)(int)Math.Round((double)value);
+			//MoldTypes mold = (MoldTypes)(value);
+			//var mold = value;
+			var attributes = mold.GetType().GetField(mold.ToString()).GetCustomAttributes(typeof(DescriptionAttribute), false);
+
+			if (attributes.Any())
+				return (attributes.First() as DescriptionAttribute).Description;
+
 			return mold.ToString();
 		}
 
@@ -84,6 +93,11 @@ namespace Fabolus_v16.MVVM.ViewModels {
 				return;//don't update and waste time
 
 			_bolusStore.MoldType = (MoldTypes)_moldShape; //will update mold
+		}
+
+		public List<MoldTypes> MoldShapes {
+			get;
+			set;
 		}
 
 		#region Scale
@@ -167,6 +181,13 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			OffsetDistance = (float)_bolusStore.MoldOffset;
 			Resolution = _bolusStore.MoldResolution;
 			MoldShape = (int)_bolusStore.MoldType;
+
+			MoldShapes = new List<MoldTypes>();
+			MoldShapes.Add(MoldTypes.BOX);
+			MoldShapes.Add(MoldTypes.FLATTOP);
+			MoldShapes.Add(MoldTypes.FLATBOTTOM);
+			MoldShapes.Add(MoldTypes.CONTOURED);
+
 
 			ScaleX = _bolusStore.MoldScaleX;
 			ScaleY = _bolusStore.MoldScaleY;
