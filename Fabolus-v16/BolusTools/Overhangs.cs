@@ -30,6 +30,8 @@ namespace Fabolus_v16 {
 		}
 
 		public static List<Vector3D> CalculateSurfaceNormals(MeshGeometry3D mesh) {
+			if (mesh == null) return null;
+
 			List<Vector3D> surfaceNormals = new();
 
 			//calculate for each triangle

@@ -36,7 +36,8 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			if (_bolusStore.BolusRaw == null)
 				return;
 
-			Bolus bolus = new Bolus(BolusTools.Smooth(_edgeSize, _smoothSpeed, (double)_iterations, (double)_marchingCubes, _bolusStore.BolusRaw));
+			//Bolus bolus = new Bolus(BolusTools.Smooth(_edgeSize, _smoothSpeed, (double)_iterations, (double)_marchingCubes, _bolusStore.BolusRaw));
+			Bolus bolus = new Bolus(BolusTools.PoissonSmoothing(_bolusStore.BolusRaw.DMesh));
 			_bolusStore.BolusSmoothed = bolus;
 
 			_bolusStore.PreviewMoldVisibility = false;

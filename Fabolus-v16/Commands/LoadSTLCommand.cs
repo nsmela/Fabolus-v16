@@ -14,8 +14,6 @@ namespace Fabolus_v16.Commands {
 		private readonly BolusStore _bolusStore;
 		private readonly MainViewModel _mainViewModel;
 
-		//store for the bolus
-
 		public LoadSTLCommand(BolusStore bolusstore) {
 			_bolusStore = bolusstore;
 		}
