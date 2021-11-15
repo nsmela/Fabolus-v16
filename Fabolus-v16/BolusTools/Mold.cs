@@ -140,7 +140,7 @@ namespace Fabolus_v16 {
 
             int airhole_z_height = Convert.ToInt32((mesh.CachedBounds.Height / numcells) * airholeLevel);
 
-            DMesh3 resultMesh = new DMesh3(Voxelize(mesh, numcells, airhole_z_height));
+            DMesh3 resultMesh = new DMesh3(VoxelizeFast(mesh, numcells, airhole_z_height));
             resultMesh = new DMesh3(MarchingCubesSmoothing(resultMesh, numcells));
 
             //scale the mesh to the original's size
@@ -154,7 +154,7 @@ namespace Fabolus_v16 {
             double y = mesh.CachedBounds.Center.y - resultMesh.CachedBounds.Center.y;
             double z = mesh.CachedBounds.Center.z - resultMesh.CachedBounds.Center.z;
             MeshTransforms.Translate(resultMesh, x, y, z);
-
+			
             return resultMesh;
         }
 
@@ -177,6 +177,25 @@ namespace Fabolus_v16 {
             voxGen.Generate();
             return voxGen.Meshes[0];
         }
+
+		static DMesh3 VoxelizeFast(DMesh3 mesh, int numcells, int airhole_z_height) {
+			DMeshAABBTree3 spatial = new DMeshAABBTree3(mesh, autoBuild: true);
+			AxisAlignedBox3d bounds = mesh.CachedBounds;
+			double cellsize = bounds.MaxDim / numcells;
+			ShiftGridIndexer3 indexer = new ShiftGridIndexer3(bounds.Min, cellsize);
+
+			spatial.FastWindingNumber(Vector3d.Zero);  // seed cache outside of parallel eval
+			Bitmap3 bmp = new Bitmap3(new Vector3i(numcells + 2, numcells + 2, numcells + 2));
+			gParallel.ForEach(bmp.Indices(), (idx) => {
+				Vector3d v = indexer.FromGrid(idx);
+				bmp.SafeSet(idx, spatial.FastWindingNumber(v) > 0.5);
+			});
+
+			VoxelSurfaceGenerator voxGen = new VoxelSurfaceGenerator();
+			voxGen.Voxels = BitmapExtendedToFloor(bmp, airhole_z_height);
+			voxGen.Generate();
+			return voxGen.Meshes[0];
+		}
 
 		static Bitmap3 BitmapExtendedToFloor(Bitmap3 bmp, int z_height = 0) {
 			int[,,] grid = new int[bmp.Dimensions.x, bmp.Dimensions.y, bmp.Dimensions.z];
