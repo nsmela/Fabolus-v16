@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Media.Media3D;
 
 namespace Fabolus_v16.MVVM.ViewModels {
 	public enum SmoothingValue {
@@ -36,9 +37,12 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			if (_bolusStore.BolusRaw == null)
 				return;
 
-			//Bolus bolus = new Bolus(BolusTools.Smooth(_edgeSize, _smoothSpeed, (double)_iterations, (double)_marchingCubes, _bolusStore.BolusRaw));
-			Bolus bolus = new Bolus(BolusTools.PoissonSmoothing(_bolusStore.BolusRaw.DMesh));
-			_bolusStore.BolusSmoothed = bolus;
+			if (_marchingCubesMode) {
+				_bolusStore.BolusSmoothed = new Bolus(BolusTools.Smooth(_edgeSize, _smoothSpeed, (double)_iterations, (double)_marchingCubes, _bolusStore.BolusRaw));
+
+			} else {
+				_bolusStore.BolusSmoothed = new Bolus(BolusTools.PoissonSmoothing(_bolusStore.BolusRaw.DMesh, _depth, _scale, _samplesPerNode));
+			}
 
 			_bolusStore.PreviewMoldVisibility = false;
 		}
@@ -83,10 +87,23 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		private float _edgeSize, _smoothSpeed;
 		private int _iterations, _marchingCubes;
 
+		private int _degrees, _depth, _samplesPerNode;
+		private float _scale;
+
+		private bool _poissonMode = true, _marchingCubesMode = false;
+
 		public float EdgeSize { get => _edgeSize; set { _edgeSize = value; CustomSmoothSettings = true; OnPropertyChanged(nameof(EdgeSize)); } }
 		public float SmoothSpeed { get => _smoothSpeed; set { _smoothSpeed = value; CustomSmoothSettings = true; OnPropertyChanged(nameof(SmoothSpeed)); } }
 		public int Iterations { get => _iterations; set { _iterations = value; CustomSmoothSettings = true; OnPropertyChanged(nameof(Iterations)); } }
 		public int MarchingCubes { get => _marchingCubes; set { _marchingCubes = value; CustomSmoothSettings = true; OnPropertyChanged(nameof(MarchingCubes)); } }
+
+		public int Degrees { get => _degrees; set { _degrees = value; CustomSmoothSettings = true; OnPropertyChanged(nameof(Degrees)); } }
+		public int Depth { get => _depth; set { _depth = value; CustomSmoothSettings = true; OnPropertyChanged(nameof(Depth)); } }
+		public int SamplesPerNode { get => _samplesPerNode; set { _samplesPerNode = value; CustomSmoothSettings = true; OnPropertyChanged(nameof(SamplesPerNode)); } }
+		public float Scale { get => _scale; set { _scale = value; CustomSmoothSettings = true; OnPropertyChanged(nameof(Scale)); } }
+
+		public bool PoissonMode { get => _poissonMode; set => _poissonMode = value; }
+		public bool MarchingCubesMode { get => _marchingCubesMode; set => _marchingCubesMode = value; }
 
 		//default values for the smoothing settings enum
 		private void DefaultSmoothSetting(SmoothingValue value) {
@@ -96,6 +113,11 @@ namespace Fabolus_v16.MVVM.ViewModels {
 					SmoothSpeed = 0.2f;
 					Iterations = 1;
 					MarchingCubes = 32;
+
+					Degrees = 1;
+					Depth = 6;
+					Scale = 1.2f;
+					SamplesPerNode = 1;
 					break;
 
 				case SmoothingValue.standard:
@@ -103,6 +125,11 @@ namespace Fabolus_v16.MVVM.ViewModels {
 					SmoothSpeed = 0.2f;
 					Iterations = 1;
 					MarchingCubes = 64;
+
+					Degrees = 1;
+					Depth = 6;
+					Scale = 1.2f;
+					SamplesPerNode = 1;
 					break;
 
 				case SmoothingValue.smoothest:
@@ -110,6 +137,11 @@ namespace Fabolus_v16.MVVM.ViewModels {
 					SmoothSpeed = 0.4f;
 					Iterations = 2;
 					MarchingCubes = 128;
+
+					Degrees = 1;
+					Depth = 6;
+					Scale = 1.2f;
+					SamplesPerNode = 1;
 					break;
 			}
 }

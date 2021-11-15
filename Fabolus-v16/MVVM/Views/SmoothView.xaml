@@ -14,7 +14,27 @@
         <BooleanToVisibilityConverter x:Key="ShowSmoothSettings" />
     </UserControl.Resources>
     
-    <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" >
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,5,5,5">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type RadioButton}" BasedOn="{StaticResource {x:Type ToggleButton}}" />
+            </StackPanel.Resources>
+            
+            <RadioButton x:Name="PoissonSmoothingToggleButton"
+                         Content="Poisson Smooth"  
+                         GroupName="typeOfSmoothing" 
+                         Style="{StaticResource {x:Type ToggleButton}}" 
+                         IsChecked="{Binding PoissonMode, Mode=TwoWay}" 
+                         Width="90"/>
+            <RadioButton x:Name="MarchingCubesToggleButton"
+                         Content="Marching Cubes" 
+                         IsChecked="{Binding MarchingCubesMode, Mode=TwoWay}" 
+                         GroupName="typeOfSmoothing" 
+                         Style="{StaticResource {x:Type ToggleButton}}" 
+                         Width="90"/>
+
+        </StackPanel>
+        
         <!-- Simple User Settings -->
         <StackPanel Margin="2" >
             <Label Content="{Binding SmoothSettingLabel}" 
@@ -39,78 +59,149 @@
                       FontSize="14" 
                       FontWeight="Bold"
                       FontFamily="\Fonts\#Poppins" />
-        <StackPanel Visibility="{Binding IsChecked, ElementName=VisibilityToggle, Converter={StaticResource ShowSmoothSettings}}" 
-                    Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}">
-            <StackPanel Orientation="Vertical" Margin="2,4,2,0">
-                <Label Content="edge size" 
-                        HorizontalAlignment="Center" 
-                        VerticalAlignment="Center"
-                        Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
-                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
-                        FontSize="12" 
-                        FontWeight="Bold"
-                        FontFamily="\Fonts\#Poppins"/>
-                <Slider Value="{Binding EdgeSize, Mode=TwoWay}"
-                        Minimum="0.2" 
-                        Maximum="2" 
-                        TickFrequency="0.2" 
-                        TickPlacement="TopLeft" 
-                        IsSnapToTickEnabled="True" 
-                        Height="30"/>
+
+        <StackPanel x:Name="AdvancedSettingsPanel" Visibility="{Binding IsChecked, ElementName=VisibilityToggle, Converter={StaticResource ShowSmoothSettings}}" >
+            <StackPanel Visibility="{Binding IsChecked, ElementName=MarchingCubesToggleButton, Converter={StaticResource ShowSmoothSettings}}">
+                <StackPanel Orientation="Vertical" Margin="2,4,2,0">
+                    <Label Content="edge size" 
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                            Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                            FontSize="12" 
+                            FontWeight="Bold"
+                            FontFamily="\Fonts\#Poppins"/>
+                    <Slider Value="{Binding EdgeSize, Mode=TwoWay}"
+                            Minimum="0.2" 
+                            Maximum="2" 
+                            TickFrequency="0.2" 
+                            TickPlacement="TopLeft" 
+                            IsSnapToTickEnabled="True" 
+                            Height="30"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" >
+                    <Label Content="smoothing speed"                        
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                            Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                            FontSize="12" 
+                            FontWeight="Bold"
+                            FontFamily="\Fonts\#Poppins"/>
+                    <Slider Value="{Binding SmoothSpeed, Mode=TwoWay}"
+                            Minimum="0.1" 
+                            Maximum="1" 
+                            TickPlacement="TopLeft" 
+                            TickFrequency="0.1" 
+                            IsSnapToTickEnabled="True" 
+                            Height="30"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <Label Content="iterations" 
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                            Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                            FontSize="12" 
+                            FontWeight="Bold"
+                            FontFamily="\Fonts\#Poppins"/>
+                    <Slider Value="{Binding Iterations, Mode=TwoWay}"
+                            Minimum="1" 
+                            Maximum="5" 
+                            TickPlacement="TopLeft" 
+                            TickFrequency="1" 
+                            IsSnapToTickEnabled="True" 
+                            Height="30"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" >
+                    <Label Content="marching cubes"                         
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                            Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                            FontSize="12" 
+                            FontWeight="Bold"
+                            FontFamily="\Fonts\#Poppins"/>
+                    <Slider Value="{Binding MarchingCubes, Mode=TwoWay}" 
+                            Minimum="0" 
+                            Maximum="256" 
+                            TickPlacement="TopLeft" 
+                            TickFrequency="16" 
+                            IsSnapToTickEnabled="True" 
+                            Height="30"/>
+                </StackPanel>
             </StackPanel>
-            <StackPanel Orientation="Vertical" >
-                <Label Content="smoothing speed"                        
-                        HorizontalAlignment="Center" 
-                        VerticalAlignment="Center"
-                        Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
-                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
-                        FontSize="12" 
-                        FontWeight="Bold"
-                        FontFamily="\Fonts\#Poppins"/>
-                <Slider Value="{Binding SmoothSpeed, Mode=TwoWay}"
-                        Minimum="0.1" 
-                        Maximum="1" 
-                        TickPlacement="TopLeft" 
-                        TickFrequency="0.1" 
-                        IsSnapToTickEnabled="True" 
-                        Height="30"/>
-            </StackPanel>
-            <StackPanel Orientation="Vertical">
-                <Label Content="iterations" 
-                        HorizontalAlignment="Center" 
-                        VerticalAlignment="Center"
-                        Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
-                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
-                        FontSize="12" 
-                        FontWeight="Bold"
-                        FontFamily="\Fonts\#Poppins"/>
-                <Slider Value="{Binding Iterations, Mode=TwoWay}"
-                        Minimum="1" 
-                        Maximum="5" 
-                        TickPlacement="TopLeft" 
-                        TickFrequency="1" 
-                        IsSnapToTickEnabled="True" 
-                        Height="30"/>
-            </StackPanel>
-            <StackPanel Orientation="Vertical" >
-                <Label Content="marching cubes"                         
-                        HorizontalAlignment="Center" 
-                        VerticalAlignment="Center"
-                        Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
-                        Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
-                        FontSize="12" 
-                        FontWeight="Bold"
-                        FontFamily="\Fonts\#Poppins"/>
-                <Slider Value="{Binding MarchingCubes, Mode=TwoWay}" 
-                        Minimum="0" 
-                        Maximum="256" 
-                        TickPlacement="TopLeft" 
-                        TickFrequency="16" 
-                        IsSnapToTickEnabled="True" 
-                        Height="30"/>
+            <StackPanel Visibility="{Binding IsChecked, ElementName=PoissonSmoothingToggleButton, Converter={StaticResource ShowSmoothSettings}}">
+                <StackPanel Orientation="Vertical" Margin="2,4,2,0">
+                    <Label Content="degrees" 
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                            Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                            FontSize="12" 
+                            FontWeight="Bold"
+                            FontFamily="\Fonts\#Poppins"/>
+                    <Slider Value="{Binding Degrees, Mode=TwoWay}"
+                            Minimum="1" 
+                            Maximum="4" 
+                            TickFrequency="1" 
+                            TickPlacement="TopLeft" 
+                            IsSnapToTickEnabled="True" 
+                            Height="30"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" >
+                    <Label Content="Depth"                        
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                            Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                            FontSize="12" 
+                            FontWeight="Bold"
+                            FontFamily="\Fonts\#Poppins"/>
+                    <Slider Value="{Binding Depth, Mode=TwoWay}"
+                            Minimum="0" 
+                            Maximum="16" 
+                            TickPlacement="TopLeft" 
+                            TickFrequency="1" 
+                            IsSnapToTickEnabled="True" 
+                            Height="30"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical">
+                    <Label Content="Scale" 
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                            Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                            FontSize="12" 
+                            FontWeight="Bold"
+                            FontFamily="\Fonts\#Poppins"/>
+                    <Slider Value="{Binding Scale, Mode=TwoWay}"
+                            Minimum="1" 
+                            Maximum="5" 
+                            TickPlacement="TopLeft" 
+                            TickFrequency="0.2" 
+                            IsSnapToTickEnabled="True" 
+                            Height="30"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" >
+                    <Label Content="Samples Per Node"                         
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
+                            Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}"
+                            FontSize="12" 
+                            FontWeight="Bold"
+                            FontFamily="\Fonts\#Poppins"/>
+                    <Slider Value="{Binding SamplesPerNode, Mode=TwoWay}" 
+                            Minimum="1" 
+                            Maximum="5" 
+                            TickPlacement="TopLeft" 
+                            TickFrequency="1" 
+                            IsSnapToTickEnabled="True" 
+                            Height="30"/>
+                </StackPanel>
             </StackPanel>
         </StackPanel>
-
         <Button Content="apply" 
                 Height="30"
                 HorizontalAlignment="Stretch"

@@ -14,7 +14,7 @@ namespace Fabolus_v16 {
 	public static partial class BolusTools {
         private static string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
         private static string ReconstructorFilePath = AppDomain.CurrentDomain.BaseDirectory + @"PoissonRecon.exe";
-        public static DMesh3 PoissonSmoothing(DMesh3 mesh) {
+        public static DMesh3 PoissonSmoothing(DMesh3 mesh, int depth = 6, float scale = 1.2f, int samples = 1) {
 
             //check the poisson reconstructor exists
             if (!File.Exists(ReconstructorFilePath)) {
@@ -30,7 +30,7 @@ namespace Fabolus_v16 {
             SaveDMeshToPLYFile(mesh, tempFolder + @"temp.ply");
 
 			//run poisson reconstructor
-			ExecutePoisson(tempFolder + @"temp.ply", tempFolder + @"temp_smooth");
+			ExecutePoisson(tempFolder + @"temp.ply", tempFolder + @"temp_smooth", depth, scale, samples);
 
             //load new mesh from ply in folder
             var result = ReadPLYFileToDMesh(tempFolder + @"temp_smooth.ply");
@@ -101,7 +101,7 @@ namespace Fabolus_v16 {
             }
         }
 
-        private static void ExecutePoisson(string inputFile, string outputFile, int depth = 6, float scale = 1.2f, int samples = 1) {
+        private static void ExecutePoisson(string inputFile, string outputFile, int depth, float scale, int samples) {
             if (File.Exists(inputFile)) {
                 //Use ProcessStartInfo class
                 ProcessStartInfo startInfo = new ProcessStartInfo();
