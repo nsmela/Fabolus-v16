@@ -115,9 +115,9 @@ namespace Fabolus_v16.MVVM.ViewModels {
 					MarchingCubes = 32;
 
 					Degrees = 1;
-					Depth = 6;
-					Scale = 1.2f;
-					SamplesPerNode = 1;
+					Depth = 9;
+					Scale = 1.8f;
+					SamplesPerNode = 2;
 					break;
 
 				case SmoothingValue.standard:
@@ -139,9 +139,9 @@ namespace Fabolus_v16.MVVM.ViewModels {
 					MarchingCubes = 128;
 
 					Degrees = 1;
-					Depth = 6;
-					Scale = 1.2f;
-					SamplesPerNode = 1;
+					Depth = 8;
+					Scale = 1.4f;
+					SamplesPerNode = 4;
 					break;
 			}
 }
