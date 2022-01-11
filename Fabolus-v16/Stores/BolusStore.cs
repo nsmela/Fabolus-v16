@@ -35,6 +35,15 @@ namespace Fabolus_v16.Stores {
 			}
 		}
 
+		public DMesh3 CurrentBolusTransformed {
+			get {
+				if (_moldBolus != null)
+					return _moldBolus.DMesh;
+
+				return ApplyBolusRotation(CurrentBolus.DMesh);
+			}
+		}
+
 		public Bolus BolusRaw { get => _bolus; set => CurrentBolus = value; }
 		public Bolus BolusSmoothed { get => _smoothedBolus; set { _smoothedBolus = value; _moldBolus = null; OnCurrentBolusChanged(); } }
 		public Bolus BolusMold { get => _moldBolus; set { _moldBolus = value; OnMoldFinalChanged(); } }

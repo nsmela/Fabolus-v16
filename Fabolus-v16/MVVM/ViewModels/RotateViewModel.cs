@@ -71,6 +71,7 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		public void ResetRotation() {
 			_bolusStore.ClearBolusTransforms();
 			OnPropertyChanged(nameof(_meshViewModel.BolusMesh));
+			OnBolusRotationChanged();
 		}
 
 		private void OnBolusRotationChanged() {

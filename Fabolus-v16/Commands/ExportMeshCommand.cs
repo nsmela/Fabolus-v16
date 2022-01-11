@@ -28,7 +28,7 @@ namespace Fabolus_v16.Commands {
 			if (_bolusStore.BolusMold != null)
 				mesh = _bolusStore.BolusMold.DMesh;
 			else
-				mesh = _bolusStore.CurrentBolus.DMesh;
+				mesh = _bolusStore.CurrentBolusTransformed; //currents the current bolus with applied transforms
 
 			StandardMeshWriter.WriteMesh(filepath, mesh, WriteOptions.Defaults);
 		}

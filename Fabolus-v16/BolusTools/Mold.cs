@@ -97,9 +97,9 @@ namespace Fabolus_v16 {
 			if (airhole_height < -900) //if there's no airholes
 				airhole_height = offsetMold.CachedBounds.Max.z;
 
-			double distance_from_mesh_bottom = Math.Abs( airhole_height - offsetMold.CachedBounds.Min.z);
+			double distance_from_mesh_bottom = Math.Abs( airhole_height - offsetMold.CachedBounds.Min.z)-10;
 			double distance_per_cell = (offsetMold.CachedBounds.Max.z - offsetMold.CachedBounds.Min.z) / resolution;
-			int z_height = Math.Clamp((int)Math.Round(distance_from_mesh_bottom/distance_per_cell, 0) - 10, 0, resolution);
+			int z_height = Math.Clamp((int)Math.Round((distance_from_mesh_bottom - 10)/distance_per_cell, 0), 0, resolution);
 
 			//turn it into a voxilized mesh
 			VoxelSurfaceGenerator voxGen = new VoxelSurfaceGenerator();
