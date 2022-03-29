@@ -46,6 +46,12 @@ namespace Fabolus_v16.MVVM.Models {
 
 		#endregion
 
+		#region Parting Line
+		public MeshGeometry3D TriangleBandMesh(Transform3D transform) {
+			return BolusTools.TriangleBand(_meshGeometry, _triangleNormals, transform);
+		}
+		#endregion
+
 		#region Triangle Normals
 		//triangle normals are calculated whenever the mesh is changed
 		//they are used to determine overhangs

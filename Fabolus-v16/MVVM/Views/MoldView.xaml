@@ -67,7 +67,7 @@
                         x:Name="moldTypeSlider"
                         Style="{DynamicResource SliderStyle1}"
                         Minimum="1" 
-                        Maximum="4" 
+                        Maximum="5" 
                         TickFrequency="1" 
                         TickPlacement="TopLeft" 
                         IsSnapToTickEnabled="True" 
