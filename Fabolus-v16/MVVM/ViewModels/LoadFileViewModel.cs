@@ -6,18 +6,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.IO;
+using Fabolus_v16.MVVM.Models;
+using System.Windows;
 
 namespace Fabolus_v16.MVVM.ViewModels {
 	class LoadFileViewModel : ViewModelBase {
 		private readonly BolusStore _bolusStore;
+		private MainViewModel _mainViewModel;
+		private bool _isBusy = false;
 
-		public ICommand LoadFileCommand { get; }
+		public IAsyncCommand LoadFileCommand { get; }
 
 		public LoadFileViewModel(MainViewModel mainViewModel) {
 			_bolusStore = mainViewModel.MainBolusStore;
-			mainViewModel.CurrentViewTitle = "load file";
+			_mainViewModel = mainViewModel;
+			_mainViewModel.CurrentViewTitle = "load file";
 
-			LoadFileCommand = new LoadSTLCommand(mainViewModel, _bolusStore);
+			LoadFileCommand = new AsyncCommand(ExecuteLoadSTLAsync, CanExecuteLoadFile);
 
 			//clears any bolus models displayed
 			_bolusStore.PreviewMoldVisibility = false;
@@ -25,5 +31,18 @@ namespace Fabolus_v16.MVVM.ViewModels {
 
 			_bolusStore.ClearBolusTransforms();
 		}
+
+		private async Task ExecuteLoadSTLAsync() {
+			if (_isBusy) return;
+
+			_isBusy = true;
+			var LoadCommand = new LoadSTLAsyncCommand(_mainViewModel, _bolusStore);
+			await LoadCommand.ExecuteAsync();
+			_isBusy = false;
+        }
+
+		private bool CanExecuteLoadFile() => !_isBusy;
+
 	}
+	
 }

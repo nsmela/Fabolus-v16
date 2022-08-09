@@ -39,6 +39,14 @@ namespace Fabolus_v16.MVVM.Models {
 			return StandardMeshReader.ReadMesh(filepath);
 		}
 
+		public async static Task<DMesh3> ReadFileAsync(string filepath) {
+			return await Task<DMesh3>.Run(() => StandardMeshReader.ReadMesh(filepath));
+		}
+
+		public async static Task<Bolus> ReadBolusAsync(string filepath) {
+			return await Task<Bolus>.Run( ()=>  new Bolus(filepath));
+		}
+
 		#region Overhangs Calculation
 		public MeshGeometry3D OverhangMesh(Transform3D transform, double angle) {
 			return BolusTools.GetOverhangs(_meshGeometry, _triangleNormals, transform, angle);

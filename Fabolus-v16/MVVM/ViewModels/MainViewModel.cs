@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Fabolus_v16.Stores;
 using Fabolus_v16.Commands;
 using Fabolus_v16.MVVM.Models;
+using System.Windows.Threading;
 
 namespace Fabolus_v16.MVVM.ViewModels {
 	public class MainViewModel : ViewModelBase {
@@ -48,6 +49,10 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		public ICommand ImportSTLCommand { get; }
 		#endregion
 
+		#region Dispatcher
+		public readonly Dispatcher MainDispatcher;
+		#endregion
+
 		public MainViewModel() {
 			_airChannelStore = new AirChannelStore();
 			_bolusStore = new BolusStore(_airChannelStore);
@@ -69,6 +74,9 @@ namespace Fabolus_v16.MVVM.ViewModels {
 
 			ImportSTLCommand = new LoadSTLCommand(this, _bolusStore);
 			ExportMeshCommand = new ExportMeshCommand(_bolusStore);
+
+			//dispatcher, used for async operations
+			MainDispatcher = Dispatcher.CurrentDispatcher;
 		}
 
 		private void OnCurrentViewModelChanged() {
