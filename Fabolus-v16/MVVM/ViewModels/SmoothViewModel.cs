@@ -127,8 +127,8 @@ namespace Fabolus_v16.MVVM.ViewModels {
 					MarchingCubes = 64;
 
 					Degrees = 1;
-					Depth = 6;
-					Scale = 1.2f;
+					Depth = 9;
+					Scale = 1.8f;
 					SamplesPerNode = 1;
 					break;
 
