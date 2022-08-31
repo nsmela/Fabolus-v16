@@ -25,6 +25,14 @@ namespace Fabolus_v16.MVVM.Models {
 				Length = length;
 		}
 
+		//used to create an enlarged meshes for boolean union
+		public MeshGeometry3D OffsetMesh(float offset) {
+			MeshBuilder mesh = new MeshBuilder(true);
+			mesh.AddSphere(Anchor, Radius);
+			mesh.AddCylinder(Anchor, new Point3D(Anchor.X, Anchor.Y, Anchor.Z + Length - 1), Radius + offset, 32, false, true);
+			return mesh.ToMesh();
+		}
+
 		public MeshGeometry3D Mesh {
 			get {
 				MeshBuilder mesh = new MeshBuilder(true);

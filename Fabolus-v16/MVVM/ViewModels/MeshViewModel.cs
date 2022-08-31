@@ -36,7 +36,7 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			get {
 				if (_bolusStore != null)
 					if (_bolusStore.CurrentBolus != null)
-						return (float)BolusMesh.Bounds.SizeZ;
+						return (float)BolusMesh.Bounds.SizeZ / 2;
 
 				return 0;
 			}

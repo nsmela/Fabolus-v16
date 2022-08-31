@@ -11,6 +11,10 @@ namespace Fabolus_v16 {
 			BoundedImplicitFunction3d meshImplicit = meshToImplicitF(sourceMesh, numcells, offset);
 			return generatMeshF(new ImplicitOffset3d() { A = meshImplicit, Offset = offset }, numcells);
 		}
+		static Bitmap3 OffsetMap(DMesh3 sourceMesh, double offset, int numcells) {
+			BoundedImplicitFunction3d meshImplicit = meshToImplicitF(sourceMesh, numcells, offset);
+			return null;
+        }
 
 	}
 }

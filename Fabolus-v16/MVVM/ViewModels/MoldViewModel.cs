@@ -17,7 +17,8 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		[Description("Uniform Box")] BOX,
 		[Description("Flatten Bottom")] FLATBOTTOM,
 		[Description("Flatten Top")] FLATTOP,
-		[Description("Contour")] CONTOURED
+		[Description("Contour")] CONTOURED,
+		[Description("Contour Extended")] CONTOUREDEXTENDED
 	}
 
 	public class MoldTypeEnumToIntValueConverter : IValueConverter {
@@ -168,6 +169,7 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		private void GenerateMold() {
 			_airChannelStore.Visibility = false;
 			_bolusStore.GenerateMold(_airChannelStore.AirChannels);
+			//_bolusStore.GenerateMoldWithAirChannels(_airChannelStore.AirChannels);
 			
 		}
 

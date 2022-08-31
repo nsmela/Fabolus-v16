@@ -116,6 +116,7 @@ namespace Fabolus_v16.Stores {
 				Model3DGroup meshes = new Model3DGroup();
 				meshes.Children.Add(BolusModelGeometry3D);
 				meshes.Children.Add(Overhangs);
+				meshes.Children.Add(PartingLine);
 				return meshes;
 			}
 		}
@@ -169,6 +170,26 @@ namespace Fabolus_v16.Stores {
 			}
 		}
 
+		#region Parting Line
+		private bool _showPartingLine = false;
+		public bool ShowPartingLine { 
+			get => _showPartingLine;
+			set {
+				_showPartingLine = value;
+				OnCurrentBolusChanged();
+			}
+		}
+
+		public GeometryModel3D PartingLine {
+			get {
+				if (!ShowPartingLine) return new GeometryModel3D();
+				Transform3DGroup transformGroup = _bolusTransform.Clone();
+				transformGroup.Children.Add(new RotateTransform3D(_tempRotation)); //from bolusStore
+				var mesh = CurrentBolus.TriangleBandMesh(transformGroup);
+				return MeshToGeometry(mesh, Colors.Blue, 0.9f);
+			}
+		}
+		#endregion
 		public void SetBolusSkin(Color color, float opacity) {
 			_meshColor = color;
 			_bolusOpacity = opacity;
@@ -288,6 +309,9 @@ namespace Fabolus_v16.Stores {
 				case MoldTypes.FLATTOP:
 					result = BolusTools.GenerateRaisedContourMold(rotated_mesh, _moldOffset, _moldResolution, _lowest_airchannel_point);
 					break;
+				case MoldTypes.CONTOUREDEXTENDED:
+					result = BolusTools.GenerateContourExtendedMold(rotated_mesh, _moldOffset, _moldResolution, _airChannelStore.AirChannels);
+					break;
 				default:
 					result = BolusTools.GenerateMold(rotated_mesh, _moldOffset, _moldResolution);
 					break;
@@ -319,6 +343,21 @@ namespace Fabolus_v16.Stores {
 			BolusMold = new Bolus(BolusTools.GenerateFinalMold(_previewMoldMesh, ApplyBolusRotation(CurrentBolus.DMesh), airChannels));
 		}
 
+		public void GenerateMoldWithAirChannels(List<AirChannel> airChannels) {
+			if (CurrentBolus == null ||
+			!_previewMold)
+				return;
+
+			if (_previewMoldMesh == null) //create the mold if none exists
+				GeneratePreviewMold();
+
+			if (_previewMoldMesh == null) //if the mold still doesn't exist, abort
+				return;
+
+			_moldBolus = null; //clears any previously generated mold
+
+			BolusMold = new Bolus(BolusTools.GenerateFinalMold(_previewMoldMesh, ApplyBolusRotation(CurrentBolus.DMesh), airChannels));
+		}
 		#endregion
 	}
 }

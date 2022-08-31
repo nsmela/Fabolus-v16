@@ -12,27 +12,22 @@ using HelixToolkit.Wpf;
 
 namespace Fabolus_v16 {
     public static partial class BolusTools {
-        /* A preview Mold requires:
-         * -offset mesh
-         * -voxilized that offset
-         * -smooth that offset
-         * 
-         * A generated Mold also includes a boolean subtraction
-         * 
-         * Mold types depend on how the mold is voxilized
-         * box: for each x,y: return true if theres at least one true on the z-plane
-         * flatbottom: going top-to-bottom, save the previous layer's shape
-         * flattop: going bottom-to-top, save the previous layer's shape and start at a specific height
-         * contour: do not voxilize
-         */
-		public static DMesh3 GenerateMold(DMesh3 mesh, double offset, int resolution = 64, double airholeLevel = -1000) {
+		/* A Mold is split by created with Boolean operations and by analyzing the bolus's voxilized mesh
+		 * A mesh is crated by using the original mesh's bitmap to create an offset mesh
+		 * Boolean Union to get the lower part of the mold
+		 * Boolean Subtraction to get the upper part
+		 * 
+		 */
+		public static DMesh3 GenerateMold(DMesh3 mesh, double offset, int resolution = 64, double airholeLevel = -1000)
+		{
 			//generate offset mesh
 			var offsetMold = OffsetMesh(mesh, offset, resolution);
 
 			return VoxilizedMold(offsetMold, airholeLevel, resolution);
 		}
 
-		public static DMesh3 GenerateContourMold(DMesh3 mesh, double offset, int resolution = 64) {
+		public static DMesh3 GenerateContourMold(DMesh3 mesh, double offset, int resolution = 64)
+		{
 			//create an inflated mold to contain the original
 			var offsetMold = OffsetMesh(mesh, offset, resolution);
 
@@ -50,7 +45,8 @@ namespace Fabolus_v16 {
 			return result;
 		}
 
-		public static DMesh3 GenerateBoxMold(DMesh3 mesh, double offset, int resolution = 64) {
+		public static DMesh3 GenerateBoxMold(DMesh3 mesh, double offset, int resolution = 64)
+		{
 			//create an inflated mold to contain the original
 			var offsetMold = OffsetMesh(mesh, offset, resolution);
 
@@ -69,7 +65,8 @@ namespace Fabolus_v16 {
 			return result;
 		}
 
-		public static DMesh3 GenerateFlattenedContourMold(DMesh3 mesh, double offset, int resolution = 64) {
+		public static DMesh3 GenerateFlattenedContourMold(DMesh3 mesh, double offset, int resolution = 64)
+		{
 			//create an inflated mold to contain the original
 			var offsetMold = OffsetMesh(mesh, offset, resolution);
 
@@ -86,7 +83,8 @@ namespace Fabolus_v16 {
 			return result;
 		}
 
-		public static DMesh3 GenerateRaisedContourMold(DMesh3 mesh, double offset, int resolution, double airhole_height) {
+		public static DMesh3 GenerateRaisedContourMold(DMesh3 mesh, double offset, int resolution, double airhole_height)
+		{
 			//create an inflated mold to contain the original
 			var offsetMold = OffsetMesh(mesh, offset, resolution);
 
@@ -97,9 +95,9 @@ namespace Fabolus_v16 {
 			if (airhole_height < -900) //if there's no airholes
 				airhole_height = offsetMold.CachedBounds.Max.z;
 
-			double distance_from_mesh_bottom = Math.Abs( airhole_height - offsetMold.CachedBounds.Min.z)-10;
+			double distance_from_mesh_bottom = Math.Abs(airhole_height - offsetMold.CachedBounds.Min.z - 10);
 			double distance_per_cell = (offsetMold.CachedBounds.Max.z - offsetMold.CachedBounds.Min.z) / resolution;
-			int z_height = Math.Clamp((int)Math.Round((distance_from_mesh_bottom - 10)/distance_per_cell, 0), 0, resolution);
+			int z_height = Math.Clamp((int)Math.Round((distance_from_mesh_bottom - 10) / distance_per_cell, 0), 0, resolution);
 
 			//turn it into a voxilized mesh
 			VoxelSurfaceGenerator voxGen = new VoxelSurfaceGenerator();
@@ -111,16 +109,37 @@ namespace Fabolus_v16 {
 			return result;
 		}
 
-		public static DMesh3 GenerateFinalMold(DMesh3 previewMold, DMesh3 bolus, List<AirChannel> airChannels) {
+		public static DMesh3 GenerateContourExtendedMold(DMesh3 mesh, double offset, int resolution, List<AirChannel> airholes) {
+			//create an inflated mold to contain the original
+			var offsetMold = OffsetMesh(mesh, offset, resolution);
+
+			//create airhole channels to be boolean union
+			if (airholes.Count < 1)
+				return offsetMold;
+						
+			//convert airchannels to DMesh3
+			DMesh3 channels = new DMesh3();
+			MeshEditor a = new MeshEditor(channels);
+			foreach (var airhole in airholes)
+			{
+				a.AppendMesh(MeshGeometryToDMesh(airhole.OffsetMesh((float)offset)));
+			}
+			DMesh3 tubes = new DMesh3(channels);
+
+			return new DMesh3(BolusTools.BooleanUnion(offsetMold, tubes));
+		}
+
+		public static DMesh3 GenerateFinalMold(DMesh3 previewMold, DMesh3 bolus, List<AirChannel> airChannels)
+		{
 			//invert bolus normals and append it to the preview mold
-			
+
 			DMesh3 invertedBolus = new DMesh3(bolus);
 			List<int> triangles = new List<int>();
 			for (int i = 0; i < invertedBolus.TriangleCount; i++) triangles.Add(i);
 			MeshEditor n = new MeshEditor(invertedBolus);
 			n.ReverseTriangles(triangles, true);
 			n.AppendMesh(previewMold);
-			DMesh3 mold = n.Mesh; 
+			DMesh3 mold = n.Mesh;
 
 			if (airChannels.Count < 1)
 				return mold;
@@ -128,7 +147,8 @@ namespace Fabolus_v16 {
 			//convert airchannels to DMesh3
 			DMesh3 channels = new DMesh3();
 			MeshEditor a = new MeshEditor(channels);
-			foreach (var airhole in airChannels) {
+			foreach (var airhole in airChannels)
+			{
 				a.AppendMesh(MeshGeometryToDMesh(airhole.Mesh));
 			}
 			DMesh3 tubes = new DMesh3(channels);
@@ -136,49 +156,54 @@ namespace Fabolus_v16 {
 			//boolean subtract airchannels from mold+bolus mesh
 			return new DMesh3(BolusTools.BooleanSubtraction(mold, tubes));
 		}
-		static DMesh3 VoxilizedMold(DMesh3 mesh, double airholeLevel, int numcells) {
 
-            int airhole_z_height = Convert.ToInt32((mesh.CachedBounds.Height / numcells) * airholeLevel);
+		static DMesh3 VoxilizedMold(DMesh3 mesh, double airholeLevel, int numcells)
+		{
 
-            DMesh3 resultMesh = new DMesh3(VoxelizeFast(mesh, numcells, airhole_z_height));
-            resultMesh = new DMesh3(MarchingCubesSmoothing(resultMesh, numcells));
+			int airhole_z_height = Convert.ToInt32((mesh.CachedBounds.Height / numcells) * airholeLevel);
 
-            //scale the mesh to the original's size
-            double scale_x = mesh.CachedBounds.Width / (resultMesh.CachedBounds.Width - 2);
-            double scale_y = mesh.CachedBounds.Depth / (resultMesh.CachedBounds.Depth - 2);
-            double scale_z = mesh.CachedBounds.Height / resultMesh.CachedBounds.Height;
-            MeshTransforms.Scale(resultMesh, scale_x, scale_y, scale_z);
+			DMesh3 resultMesh = new DMesh3(VoxelizeFast(mesh, numcells, airhole_z_height));
+			resultMesh = new DMesh3(MarchingCubesSmoothing(resultMesh, numcells));
 
-            //positioning the mesh ontop of the old one
-            double x = mesh.CachedBounds.Center.x - resultMesh.CachedBounds.Center.x;
-            double y = mesh.CachedBounds.Center.y - resultMesh.CachedBounds.Center.y;
-            double z = mesh.CachedBounds.Center.z - resultMesh.CachedBounds.Center.z;
-            MeshTransforms.Translate(resultMesh, x, y, z);
-			
-            return resultMesh;
-        }
+			//scale the mesh to the original's size
+			double scale_x = mesh.CachedBounds.Width / (resultMesh.CachedBounds.Width - 2);
+			double scale_y = mesh.CachedBounds.Depth / (resultMesh.CachedBounds.Depth - 2);
+			double scale_z = mesh.CachedBounds.Height / resultMesh.CachedBounds.Height;
+			MeshTransforms.Scale(resultMesh, scale_x, scale_y, scale_z);
 
-        static DMesh3 Voxelize(DMesh3 mesh, int numcells, int airhole_z_height) {
-            //create voxel mesh
-            DMeshAABBTree3 spatial = new DMeshAABBTree3(mesh, autoBuild: true);
-            AxisAlignedBox3d bounds = mesh.CachedBounds;
+			//positioning the mesh ontop of the old one
+			double x = mesh.CachedBounds.Center.x - resultMesh.CachedBounds.Center.x;
+			double y = mesh.CachedBounds.Center.y - resultMesh.CachedBounds.Center.y;
+			double z = mesh.CachedBounds.Center.z - resultMesh.CachedBounds.Center.z;
+			MeshTransforms.Translate(resultMesh, x, y, z);
 
-            double cellsize = bounds.MaxDim / numcells;
-            ShiftGridIndexer3 indexer = new ShiftGridIndexer3(bounds.Min, cellsize);
+			return resultMesh;
+		}
 
-            Bitmap3 bmp = new Bitmap3(new Vector3i(numcells, numcells, numcells));
-            foreach (Vector3i idx in bmp.Indices()) {
-                Vector3d v = indexer.FromGrid(idx);
-                bmp.Set(idx, spatial.IsInside(v));
-            }
+		static DMesh3 Voxelize(DMesh3 mesh, int numcells, int airhole_z_height)
+		{
+			//create voxel mesh
+			DMeshAABBTree3 spatial = new DMeshAABBTree3(mesh, autoBuild: true);
+			AxisAlignedBox3d bounds = mesh.CachedBounds;
 
-            VoxelSurfaceGenerator voxGen = new VoxelSurfaceGenerator();
-            voxGen.Voxels = BitmapExtendedToFloor(bmp, airhole_z_height);
-            voxGen.Generate();
-            return voxGen.Meshes[0];
-        }
+			double cellsize = bounds.MaxDim / numcells;
+			ShiftGridIndexer3 indexer = new ShiftGridIndexer3(bounds.Min, cellsize);
 
-		static DMesh3 VoxelizeFast(DMesh3 mesh, int numcells, int airhole_z_height) {
+			Bitmap3 bmp = new Bitmap3(new Vector3i(numcells, numcells, numcells));
+			foreach (Vector3i idx in bmp.Indices())
+			{
+				Vector3d v = indexer.FromGrid(idx);
+				bmp.Set(idx, spatial.IsInside(v));
+			}
+
+			VoxelSurfaceGenerator voxGen = new VoxelSurfaceGenerator();
+			voxGen.Voxels = BitmapExtendedToFloor(bmp, airhole_z_height);
+			voxGen.Generate();
+			return voxGen.Meshes[0];
+		}
+
+		static DMesh3 VoxelizeFast(DMesh3 mesh, int numcells, int airhole_z_height)
+		{
 			DMeshAABBTree3 spatial = new DMeshAABBTree3(mesh, autoBuild: true);
 			AxisAlignedBox3d bounds = mesh.CachedBounds;
 			double cellsize = bounds.MaxDim / numcells;
@@ -197,15 +222,18 @@ namespace Fabolus_v16 {
 			return voxGen.Meshes[0];
 		}
 
-		static Bitmap3 BitmapExtendedToFloor(Bitmap3 bmp, int z_height = 0) {
+		static Bitmap3 BitmapExtendedToFloor(Bitmap3 bmp, int z_height = 0)
+		{
 			int[,,] grid = new int[bmp.Dimensions.x, bmp.Dimensions.y, bmp.Dimensions.z];
 			int zTop = bmp.Dimensions.z - 1;
 
 			//check the very top for filled voxels (true or false)
 			//-1 if nothing is above, otherwise number is how far from filled voxel above this one
 			//to be used later one for more robust calculations
-			for(int x = 0; x < bmp.Dimensions.x; x++) {
-				for (int y = 0; y < bmp.Dimensions.y; y++) {
+			for (int x = 0; x < bmp.Dimensions.x; x++)
+			{
+				for (int y = 0; y < bmp.Dimensions.y; y++)
+				{
 					if (bmp.Get(new Vector3i(x, y, zTop))) grid[x, y, zTop] = 0;
 					else grid[x, y, zTop] = -1;
 				}
@@ -215,9 +243,12 @@ namespace Fabolus_v16 {
 			//filled is original is filled
 			//if not, counts how far from a filled cell above itself
 			//-1 if whole cell stack is empty so far
-			for (int z = zTop-1; z >= 0; z--) {
-				for (int x = 0; x < bmp.Dimensions.x; x++) {
-					for (int y = 0; y < bmp.Dimensions.y; y++) {
+			for (int z = zTop - 1; z >= 0; z--)
+			{
+				for (int x = 0; x < bmp.Dimensions.x; x++)
+				{
+					for (int y = 0; y < bmp.Dimensions.y; y++)
+					{
 						Vector3i cell = new Vector3i(x, y, z);
 						bool value = bmp.Get(cell);
 
@@ -227,12 +258,15 @@ namespace Fabolus_v16 {
 					}
 				}
 			}
-			
+
 			//pass the grid results over to a new bitmap
-			Bitmap3 result= new Bitmap3(bmp.Dimensions);
-			for (int x = 0; x < bmp.Dimensions.x; x++) {
-				for (int y = 0; y < bmp.Dimensions.y; y++) {
-					for (int z = 0; z < bmp.Dimensions.z; z++) {
+			Bitmap3 result = new Bitmap3(bmp.Dimensions);
+			for (int x = 0; x < bmp.Dimensions.x; x++)
+			{
+				for (int y = 0; y < bmp.Dimensions.y; y++)
+				{
+					for (int z = 0; z < bmp.Dimensions.z; z++)
+					{
 						bool value = grid[x, y, z] > -1;
 						result.Set(new Vector3i(x, y, z), value);
 					}
@@ -240,18 +274,23 @@ namespace Fabolus_v16 {
 			}
 
 			return result;
-			
+
 		}
 
-		static Bitmap3 BitmapExtendedToCeiling(Bitmap3 bmp, int z_height = 0) {
+		static Bitmap3 BitmapExtendedToCeiling(Bitmap3 bmp, int z_height = 0)
+		{
 			int[,,] grid = new int[bmp.Dimensions.x, bmp.Dimensions.y, bmp.Dimensions.z];
 			int z_top = 0;
 
 			//getting the top layer
-			for (int x = 0; x < bmp.Dimensions.x; x++) {
-				for (int y = 0; y < bmp.Dimensions.y; y++) {
-					for (int z = z_height; z < bmp.Dimensions.z; z++) {
-						if (bmp.Get(new Vector3i(x, y, z))) {
+			for (int x = 0; x < bmp.Dimensions.x; x++)
+			{
+				for (int y = 0; y < bmp.Dimensions.y; y++)
+				{
+					for (int z = z_height; z < bmp.Dimensions.z; z++)
+					{
+						if (bmp.Get(new Vector3i(x, y, z)))
+						{
 							if (z > z_top) z_top = z;
 						}
 					}
@@ -260,10 +299,14 @@ namespace Fabolus_v16 {
 
 			//if an airhole is too low, this will extend the mesh from the lowest airhole up to the top.
 			//the 3D print will be easier to fill
-			if (z_height > 0) {
-				for (int z = z_height; z <= z_top; z++) {
-					for (int x = 0; x < bmp.Dimensions.x; x++) {
-						for (int y = 0; y < bmp.Dimensions.y; y++) {
+			if (z_height > 0)
+			{
+				for (int z = z_height; z <= z_top; z++)
+				{
+					for (int x = 0; x < bmp.Dimensions.x; x++)
+					{
+						for (int y = 0; y < bmp.Dimensions.y; y++)
+						{
 							bool value = bmp.Get(new Vector3i(x, y, z - 1));
 							if (value) bmp.Set(new Vector3i(x, y, z), value);
 						}
@@ -274,59 +317,74 @@ namespace Fabolus_v16 {
 			return bmp;
 		}
 
-		static Bitmap3 BitmapBox(Bitmap3 bmp) {
-		int[,,] grid = new int[bmp.Dimensions.x, bmp.Dimensions.y, bmp.Dimensions.z];
+		static Bitmap3 BitmapBox(Bitmap3 bmp)
+		{
+			int[,,] grid = new int[bmp.Dimensions.x, bmp.Dimensions.y, bmp.Dimensions.z];
 
-		//getting the top and bottoms
-		int z_bottom = 0;
-		for (int z = 0; z < bmp.Dimensions.z; z++) {
-			if (z_bottom != 0) break;
-				
-			for (int x = 0; x < bmp.Dimensions.x; x++) {
+			//getting the top and bottoms
+			int z_bottom = 0;
+			for (int z = 0; z < bmp.Dimensions.z; z++)
+			{
 				if (z_bottom != 0) break;
 
-				for (int y = 0; y < bmp.Dimensions.y; y++) {
-					if ( bmp.Get(new Vector3i(x, y, z))) {
-						z_bottom = z;
-						break;
-					}
-				}
-			}
-				
-		}
+				for (int x = 0; x < bmp.Dimensions.x; x++)
+				{
+					if (z_bottom != 0) break;
 
-		int z_top = z_bottom;
-
-		for (int x = 0; x < bmp.Dimensions.x; x++) {
-			for (int y = 0; y < bmp.Dimensions.y; y++) {
-				for (int z = z_bottom; z < bmp.Dimensions.z; z++) {
-					if (bmp.Get(new Vector3i(x, y, z))) {
-						if (z > z_top) z_top = z;
-					}
-				}
-			}
-		}
-
-		//if an airhole is too low, this will extend the mesh from the lowest airhole up to the top.
-		//the 3D print will be easier to fill
-		for (int x = 0; x < bmp.Dimensions.x; x++) {
-			for (int y = 0; y < bmp.Dimensions.y; y++) {
-				for (int z = z_bottom; z <= z_top; z++) {
-					if (bmp.Get(new Vector3i(x, y, z))){
-						for (int j = z_bottom; j <= z_top; j++) {
-							bmp.Set(new Vector3i(x, y, j), true);
+					for (int y = 0; y < bmp.Dimensions.y; y++)
+					{
+						if (bmp.Get(new Vector3i(x, y, z)))
+						{
+							z_bottom = z;
+							break;
 						}
-						break;
+					}
+				}
+
+			}
+
+			int z_top = z_bottom;
+
+			for (int x = 0; x < bmp.Dimensions.x; x++)
+			{
+				for (int y = 0; y < bmp.Dimensions.y; y++)
+				{
+					for (int z = z_bottom; z < bmp.Dimensions.z; z++)
+					{
+						if (bmp.Get(new Vector3i(x, y, z)))
+						{
+							if (z > z_top) z_top = z;
+						}
 					}
 				}
 			}
-		}
-			
 
-		return bmp;
+			//if an airhole is too low, this will extend the mesh from the lowest airhole up to the top.
+			//the 3D print will be easier to fill
+			for (int x = 0; x < bmp.Dimensions.x; x++)
+			{
+				for (int y = 0; y < bmp.Dimensions.y; y++)
+				{
+					for (int z = z_bottom; z <= z_top; z++)
+					{
+						if (bmp.Get(new Vector3i(x, y, z)))
+						{
+							for (int j = z_bottom; j <= z_top; j++)
+							{
+								bmp.Set(new Vector3i(x, y, j), true);
+							}
+							break;
+						}
+					}
+				}
+			}
+
+
+			return bmp;
 		}
 
-		static void CentreMesh(DMesh3 mesh, DMesh3 originalMesh) {
+		static void CentreMesh(DMesh3 mesh, DMesh3 originalMesh)
+		{
 			//scale the mesh to the original's size
 			double scale_x = originalMesh.CachedBounds.Width / (mesh.CachedBounds.Width - 2);
 			double scale_y = originalMesh.CachedBounds.Depth / (mesh.CachedBounds.Depth - 2);
@@ -340,7 +398,8 @@ namespace Fabolus_v16 {
 			MeshTransforms.Translate(mesh, x, y, z);
 		}
 
-		static void ScaleMesh(DMesh3 mesh, DMesh3 originalMesh, double offset) {
+		static void ScaleMesh(DMesh3 mesh, DMesh3 originalMesh, double offset)
+		{
 			//distance to have offset mesh match
 			double x = (originalMesh.CachedBounds.Max.x - originalMesh.CachedBounds.Min.x) + (offset * 2);
 			double y = (originalMesh.CachedBounds.Max.y - originalMesh.CachedBounds.Min.y) + (offset * 2);
@@ -360,8 +419,9 @@ namespace Fabolus_v16 {
 			MeshTransforms.Scale(mesh, scale, Vector3d.Zero);
 		}
 
-		static DMesh3 MarchingCubesSmoothing(DMesh3 mesh, int numcells) {
-			double cell_size = mesh.CachedBounds.MaxDim / (numcells );
+		static DMesh3 MarchingCubesSmoothing(DMesh3 mesh, int numcells)
+		{
+			double cell_size = mesh.CachedBounds.MaxDim / (numcells);
 
 			MeshSignedDistanceGrid sdf = new MeshSignedDistanceGrid(mesh, cell_size);
 			sdf.Compute();
@@ -378,7 +438,8 @@ namespace Fabolus_v16 {
 			return c.Mesh;
 		}
 
-		static Bitmap3 MeshBitmap(DMesh3 mesh, int numcells) {
+		static Bitmap3 MeshBitmap(DMesh3 mesh, int numcells)
+		{
 			//create voxel mesh
 			DMeshAABBTree3 spatial = new DMeshAABBTree3(mesh, autoBuild: true);
 			AxisAlignedBox3d bounds = mesh.CachedBounds;
@@ -387,7 +448,8 @@ namespace Fabolus_v16 {
 			ShiftGridIndexer3 indexer = new ShiftGridIndexer3(bounds.Min, cellsize);
 
 			Bitmap3 bmp = new Bitmap3(new Vector3i(numcells, numcells, numcells));
-			foreach (Vector3i idx in bmp.Indices()) {
+			foreach (Vector3i idx in bmp.Indices())
+			{
 				Vector3d v = indexer.FromGrid(idx);
 				bmp.Set(idx, spatial.IsInside(v));
 			}
