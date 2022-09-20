@@ -1,6 +1,7 @@
 ﻿using Fabolus_v16.Commands;
 using Fabolus_v16.MVVM.Models;
 using Fabolus_v16.Stores;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -39,11 +40,11 @@ namespace Fabolus_v16.MVVM.ViewModels {
 
 			if (_marchingCubesMode) {
 				_bolusStore.BolusSmoothed = new Bolus(BolusTools.Smooth(_edgeSize, _smoothSpeed, (double)_iterations, (double)_marchingCubes, _bolusStore.BolusRaw));
-
+				Log.Information($"Smoothed bolus using Marching Cubes: EdgeSize {_edgeSize} Speed {_smoothSpeed} Iterations {_iterations} Cubes {_marchingCubes}");
 			} else {
 				_bolusStore.BolusSmoothed = new Bolus(BolusTools.PoissonSmoothing(_bolusStore.BolusRaw.DMesh, _depth, _scale, _samplesPerNode));
+				Log.Information($"Smoothed bolus using Poisson: Depth { _depth} Scale {_scale} Samples per node {_samplesPerNode}");
 			}
-
 			_bolusStore.PreviewMoldVisibility = false;
 		}
 

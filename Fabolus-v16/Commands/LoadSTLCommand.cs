@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Fabolus_v16.MVVM.Models;
 using System.Windows.Threading;
+using Serilog;
 
 namespace Fabolus_v16.Commands {
 	class LoadSTLCommand : CommandBase {
@@ -35,9 +36,11 @@ namespace Fabolus_v16.Commands {
 				return;
 
 			var filepath = openFile.FileName;
+			Log.Information($"Loading file from: {filepath}");
 
 			if (!File.Exists(filepath)) {
 				System.Windows.MessageBox.Show("Unable to find: " + filepath);
+				Log.Error($"Unable to find: {filepath}");
 				return;
 			}
 

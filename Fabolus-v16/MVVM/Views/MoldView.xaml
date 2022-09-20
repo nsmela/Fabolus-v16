@@ -14,13 +14,26 @@
              Background="{DynamicResource MahApps.Brushes.Button.Flat.Background}">
     <UserControl.Resources>
         <viewModels:MoldTypeEnumToIntValueConverter x:Key="moldTypeEnumToStringConverter" />
+        <BooleanToVisibilityConverter x:Key="ShowMoldSettings" />
     </UserControl.Resources>
+    
     
     <StackPanel HorizontalAlignment="Stretch" 
                 VerticalAlignment="Top" 
                 Margin="4,0,4,0">
-        <ToggleButton Content="Preview On" Margin="0,4,0,4"/>
-        <Label Content="mold offset" 
+        <ToggleButton Content="advanced settings"
+                      x:Name="VisibilityToggle" 
+                      Style="{StaticResource MahApps.Styles.Button}"
+                      HorizontalAlignment="Stretch" 
+                      VerticalAlignment="Center"
+                      FontSize="14" 
+                      FontWeight="Bold"
+                      FontFamily="\Fonts\#Poppins" 
+                      Margin="0,4,0,4"/>
+        
+        <StackPanel x:Name="AdvancedSettingsPanel" Visibility="{Binding IsChecked, ElementName=VisibilityToggle, Converter={StaticResource ShowMoldSettings}}" >
+            <ToggleButton Content="Preview On" Margin="0,4,0,4"/>
+            <Label Content="mold offset" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"
                         Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
@@ -28,7 +41,7 @@
                         FontSize="12" 
                         FontWeight="Bold"
                         FontFamily="\Fonts\#Poppins"/>
-        <Slider Value="{Binding OffsetDistance, Mode=TwoWay}"
+            <Slider Value="{Binding OffsetDistance, Mode=TwoWay}"
                         Minimum="2" 
                         Maximum="8" 
                         TickFrequency="0.5" 
@@ -38,7 +51,7 @@
                         IsSnapToTickEnabled="True" 
                         Height="30"
                         b:SliderExtension.DragCompletedCommand="{Binding OffsetDistanceSliderDragCompleteCommand}"  />
-        <Label Content="mold resolution" 
+            <Label Content="mold resolution" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"
                         Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
@@ -46,7 +59,7 @@
                         FontSize="12" 
                         FontWeight="Bold"
                         FontFamily="\Fonts\#Poppins"/>
-        <Slider Value="{Binding Resolution, Mode=TwoWay}"
+            <Slider Value="{Binding Resolution, Mode=TwoWay}"
                         Minimum="64" 
                         Maximum="192" 
                         Ticks="64, 96, 128, 160, 192"
@@ -55,7 +68,7 @@
                         IsSnapToTickEnabled="True" 
                         Height="30"
                         b:SliderExtension.DragCompletedCommand="{Binding ResolutionSliderDragCompleteCommand}"  />
-        <Label Content="{Binding Path=Value, ElementName=moldTypeSlider, Converter={StaticResource moldTypeEnumToStringConverter}}" 
+            <Label Content="{Binding Path=Value, ElementName=moldTypeSlider, Converter={StaticResource moldTypeEnumToStringConverter}}" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"
                         Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
@@ -63,7 +76,7 @@
                         FontSize="12" 
                         FontWeight="Bold"
                         FontFamily="\Fonts\#Poppins"/>
-        <Slider Value="{Binding MoldShape, Mode=TwoWay}"
+            <Slider Value="{Binding MoldShape, Mode=TwoWay}"
                         x:Name="moldTypeSlider"
                         Style="{DynamicResource SliderStyle1}"
                         Minimum="1" 
@@ -73,7 +86,7 @@
                         IsSnapToTickEnabled="True" 
                         Height="30"
                         b:SliderExtension.DragCompletedCommand="{Binding MoldTypeSliderDragCompleteCommand}"  />
-        <!-- <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Height="30">
+            <!-- <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Height="30">
             <Label Content="mold type: " 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"
@@ -89,8 +102,8 @@
                 Margin="20,0,0,0"/>
         </StackPanel> -->
 
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Visibility="Collapsed">
-            <Label Content="x scale" 
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Visibility="Collapsed">
+                <Label Content="x scale" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"
                         Height="22"
@@ -99,7 +112,7 @@
                         FontSize="12" 
                         FontWeight="Bold"
                         FontFamily="\Fonts\#Poppins"/>
-            <Slider Value="{Binding ScaleX, Mode=TwoWay}"
+                <Slider Value="{Binding ScaleX, Mode=TwoWay}"
                         Minimum="0.9" 
                         Maximum="1.1"
                         TickFrequency="0.01"
@@ -109,7 +122,7 @@
                         IsSnapToTickEnabled="True" 
                         Height="24"
                         b:SliderExtension.DragCompletedCommand="{Binding ScaleXSliderDragCompleteCommand}"  />
-            <Label Content="y scale" 
+                <Label Content="y scale" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"
                    Height="22"
@@ -118,7 +131,7 @@
                         FontSize="12" 
                         FontWeight="Bold"
                         FontFamily="\Fonts\#Poppins"/>
-            <Slider Value="{Binding ScaleY, Mode=TwoWay}"
+                <Slider Value="{Binding ScaleY, Mode=TwoWay}"
                         Minimum="0.9" 
                         Maximum="1.1"
                         TickFrequency="0.01"
@@ -128,7 +141,7 @@
                         IsSnapToTickEnabled="True" 
                         Height="24"
                         b:SliderExtension.DragCompletedCommand="{Binding ScaleYSliderDragCompleteCommand}"  />
-            <Label Content="z scale" 
+                <Label Content="z scale" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"
                    Height="22"
@@ -137,7 +150,7 @@
                         FontSize="12" 
                         FontWeight="Bold"
                         FontFamily="\Fonts\#Poppins"/>
-            <Slider Value="{Binding ScaleZ, Mode=TwoWay}"
+                <Slider Value="{Binding ScaleZ, Mode=TwoWay}"
                         Minimum="0.9" 
                         Maximum="1.1"
                         TickFrequency="0.01"
@@ -147,10 +160,10 @@
                         IsSnapToTickEnabled="True" 
                         Height="24"
                         b:SliderExtension.DragCompletedCommand="{Binding ScaleZSliderDragCompleteCommand}"  />
-        </StackPanel>
+            </StackPanel>
 
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Visibility="Collapsed">
-            <Label Content="x translate" 
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" Visibility="Collapsed">
+                <Label Content="x translate" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"
                         Height="22"
@@ -159,7 +172,7 @@
                         FontSize="12" 
                         FontWeight="Bold"
                         FontFamily="\Fonts\#Poppins"/>
-            <Slider Value="{Binding TranslateX, Mode=TwoWay}"
+                <Slider Value="{Binding TranslateX, Mode=TwoWay}"
                         Minimum="-10" 
                         Maximum="10"
                         TickFrequency="1"
@@ -168,7 +181,7 @@
                         IsSnapToTickEnabled="True" 
                         Height="24"
                         b:SliderExtension.DragCompletedCommand="{Binding TranslateXSliderDragCompleteCommand}"  />
-            <Label Content="y translate" 
+                <Label Content="y translate" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"
                    Height="22"
@@ -177,7 +190,7 @@
                         FontSize="12" 
                         FontWeight="Bold"
                         FontFamily="\Fonts\#Poppins"/>
-            <Slider Value="{Binding TranslateY, Mode=TwoWay}"
+                <Slider Value="{Binding TranslateY, Mode=TwoWay}"
                         Minimum="-10" 
                         Maximum="10"
                         TickFrequency="1"
@@ -187,7 +200,7 @@
                         IsSnapToTickEnabled="True" 
                         Height="24"
                         b:SliderExtension.DragCompletedCommand="{Binding TranslateYSliderDragCompleteCommand}"  />
-            <Label Content="z translate" 
+                <Label Content="z translate" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"
                    Height="22"
@@ -196,7 +209,7 @@
                         FontSize="12" 
                         FontWeight="Bold"
                         FontFamily="\Fonts\#Poppins"/>
-            <Slider Value="{Binding TranslateZ, Mode=TwoWay}"
+                <Slider Value="{Binding TranslateZ, Mode=TwoWay}"
                         Minimum="-10" 
                         Maximum="10"
                         TickFrequency="1"
@@ -206,8 +219,8 @@
                         IsSnapToTickEnabled="True" 
                         Height="24"
                         b:SliderExtension.DragCompletedCommand="{Binding TranslateZSliderDragCompleteCommand}"  />
+            </StackPanel>
         </StackPanel>
-        
         <Button Content="generate" 
                 Height="30"
                 HorizontalAlignment="Stretch"

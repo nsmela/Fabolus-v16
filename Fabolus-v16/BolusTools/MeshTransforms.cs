@@ -1,4 +1,5 @@
 ﻿using g3;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace Fabolus_v16 {
             double y = mesh.CachedBounds.Center.y * -1;
             double z = mesh.CachedBounds.Center.z * -1;
             MeshTransforms.Translate(mesh, x, y, z);
+			Log.Information($"translated mesh x: {x.ToString("0.00")} y: {y.ToString("0.00")} z: {z.ToString("0.00")}");
             return mesh;
         }
 

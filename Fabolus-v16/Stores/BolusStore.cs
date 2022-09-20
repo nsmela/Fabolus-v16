@@ -1,6 +1,7 @@
 ﻿using Fabolus_v16.MVVM.Models;
 using Fabolus_v16.MVVM.ViewModels;
 using g3;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Windows.Media;
@@ -198,6 +199,7 @@ namespace Fabolus_v16.Stores {
 		#endregion
 
 		#region Rotation and Transforms
+		//used by axis sliders to rotate the mesh before saving the position
 		public AxisAngleRotation3D BolusRotation {
 			set {
 				_tempRotation = value;
@@ -219,6 +221,7 @@ namespace Fabolus_v16.Stores {
 
 		public Transform3DGroup TransformGroup { get => _bolusTransform.Clone(); }
 		
+		//a store for all transformations made
 		public void AddTransform(Vector3D axis, double angle) {
 			//rotation for DMesh3
 			if (_bolusRotation == null)
@@ -228,16 +231,57 @@ namespace Fabolus_v16.Stores {
 
 			var rotate = new AxisAngleRotation3D(axis, angle);
 			_bolusTransform.Children.Add(new RotateTransform3D(rotate));
+			LogTransform();
 			OnCurrentBolusChanged();
 		}
 		public void ClearBolusTransforms() {
 			_bolusTransform.Children.Clear();
 			_bolusRotation = new List<Quaterniond>();
+			Log.Information($"mesh transforms cleared!");
 
 			OnBolusRotate();
 			OnCurrentBolusChanged();
 			OnMoldPreviewChanged();
 		}
+
+		//used to output transform to a text file for logging
+		private void LogTransform() {
+			var transform = Quaterniond.Identity;
+			
+			//combine transforms
+			foreach(var rotation in _bolusRotation) {
+				transform *= rotation;
+            }
+
+			//convert to Euler Angles
+			Vector3D angles = new();
+			float radToDeg = 57.2958f;
+
+			// roll / x
+			double sinr_cosp = 2 * (transform.w * transform.x + transform.y * transform.z);
+			double cosr_cosp = 1 - 2 * (transform.x * transform.x + transform.y * transform.y);
+			angles.X = (float)Math.Atan2(sinr_cosp, cosr_cosp);
+			angles.X *= radToDeg;
+
+			// pitch / y
+			double sinp = 2 * (transform.w * transform.y - transform.z * transform.x);
+			if (Math.Abs(sinp) >= 1) {
+				angles.Y = (float)Math.CopySign(Math.PI / 2, sinp);
+			}
+			else {
+				angles.Y = (float)Math.Asin(sinp) * radToDeg;
+			}
+			angles.Y *= radToDeg;
+
+			// yaw / z
+			double siny_cosp = 2 * (transform.w * transform.z + transform.x * transform.y);
+			double cosy_cosp = 1 - 2 * (transform.y * transform.y + transform.z * transform.z);
+			angles.Z = (float)Math.Atan2(siny_cosp, cosy_cosp);
+			angles.Z *= radToDeg;
+
+			string transformText = $"x: {angles.X.ToString("0.00")} y: {angles.Y.ToString("0.00")} z: {angles.Z.ToString("0.00")}";
+			Log.Information($"new mesh transform: {transformText}");
+        }
 
 		#endregion
 
@@ -254,7 +298,7 @@ namespace Fabolus_v16.Stores {
 		private int _moldResolution = 64;
 		private float _moldOpacity = 0.4f;
 		private Color _moldColor = Colors.Violet;
-		private MoldTypes _moldType = MoldTypes.FLATTOP;
+		private MoldTypes _moldType = MoldTypes.BOX;
 		private GeometryModel3D _moldMesh;
 		private DMesh3 _previewMoldMesh;
 		private double _lowest_airchannel_point;

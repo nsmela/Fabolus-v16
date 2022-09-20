@@ -15,6 +15,19 @@
     </UserControl.Resources>
     
     <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" >
+
+
+        <!-- Advanced User Settings -->
+        <ToggleButton Content="advanced settings"
+                      x:Name="VisibilityToggle" 
+                      Style="{StaticResource MahApps.Styles.Button}"
+                      HorizontalAlignment="Stretch" 
+                      VerticalAlignment="Center"
+                      FontSize="14" 
+                      FontWeight="Bold"
+                      FontFamily="\Fonts\#Poppins" />
+
+        <StackPanel x:Name="AdvancedSettingsPanel" Visibility="{Binding IsChecked, ElementName=VisibilityToggle, Converter={StaticResource ShowSmoothSettings}}" >
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,5,5,5">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type RadioButton}" BasedOn="{StaticResource {x:Type ToggleButton}}" />
@@ -48,19 +61,8 @@
         </StackPanel>
         <Slider Style="{DynamicResource SliderStyle1}" Value="{Binding SmoothingSettingInt, Mode=TwoWay}"
                 Minimum="0" Maximum="2" TickFrequency="1" IsSnapToTickEnabled="True"
-                Margin="12,0,12,10" />
-
-        <!-- Advanced User Settings -->
-        <ToggleButton Content="advanced settings"
-                      x:Name="VisibilityToggle" 
-                      Style="{StaticResource MahApps.Styles.Button}"
-                      HorizontalAlignment="Stretch" 
-                      VerticalAlignment="Center"
-                      FontSize="14" 
-                      FontWeight="Bold"
-                      FontFamily="\Fonts\#Poppins" />
-
-        <StackPanel x:Name="AdvancedSettingsPanel" Visibility="{Binding IsChecked, ElementName=VisibilityToggle, Converter={StaticResource ShowSmoothSettings}}" >
+                Margin="12,0,12,10" />            
+            
             <StackPanel Visibility="{Binding IsChecked, ElementName=MarchingCubesToggleButton, Converter={StaticResource ShowSmoothSettings}}">
                 <StackPanel Orientation="Vertical" Margin="2,4,2,0">
                     <Label Content="edge size" 
