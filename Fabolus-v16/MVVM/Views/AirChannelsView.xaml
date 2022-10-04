@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewModels="clr-namespace:Fabolus_v16.MVVM.ViewModels"
              xmlns:local="clr-namespace:Fabolus_v16.MVVM.Views"
+             xmlns:custom="clr-namespace:Fabolus_v16.ViewControls"
              xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              d:DataContext="{d:DesignInstance Type=viewModels:AirChannelsViewModel}"
              xmlns:b="clr-namespace:Fabolus_v16.Behaviors"
@@ -14,7 +15,7 @@
     <StackPanel HorizontalAlignment="Stretch" 
                 VerticalAlignment="Top" 
                 Margin="4,0,4,0">
-        <Label Content="channel radius" 
+        <Label Content="channel diameter" 
                         HorizontalAlignment="Center" 
                         VerticalAlignment="Center"
                         Foreground="{DynamicResource MahApps.Brushes.Button.Flat.Foreground}"
@@ -22,11 +23,13 @@
                         FontSize="12" 
                         FontWeight="Bold"
                         FontFamily="\Fonts\#Poppins"/>
-        <Slider Value="{Binding ChannelRadius, Mode=TwoWay}"
-                        Minimum="1" 
-                        Maximum="5" 
+        <custom:FormattedSlider 
+                        Value="{Binding ChannelDiameter, Mode=TwoWay}"
+                        Minimum="2" 
+                        Maximum="10" 
                         TickFrequency="0.5" 
                         TickPlacement="TopLeft" 
+                        AutoToolTipFormat="{}{0} mm"
                         AutoToolTipPlacement="TopLeft"
                         AutoToolTipPrecision="1"
                         IsSnapToTickEnabled="True" 

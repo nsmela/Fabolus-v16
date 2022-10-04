@@ -10,18 +10,19 @@ using g3;
 namespace Fabolus_v16.MVVM.Models {
 	public class AirChannel {
 		private Point3D _anchor;
-		private double _radius;
+		private double _diameter;
 		private float _length;
 
 		public Point3D Anchor { get => _anchor; set => _anchor = value; }
-		public double Radius { get => _radius; set => _radius = value; }
+		public double Diameter { get => _diameter; set => _diameter = value; }
+		public double Radius => _diameter / 2;
 		public float Length { get => _length; set => _length = value; }
 		private Vector3d point { get => new Vector3d(Anchor.X, Anchor.Y, Anchor.Z - 2); }
 
 
-		public AirChannel(Point3D anchor, double radius, float length) {
+		public AirChannel(Point3D anchor, double diameter, float length) {
 				Anchor = anchor;
-				Radius = radius;
+				Diameter = diameter;
 				Length = length;
 		}
 

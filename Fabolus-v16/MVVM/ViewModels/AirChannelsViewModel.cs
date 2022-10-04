@@ -25,7 +25,7 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			_airChannelStore = mainViewModel.MainAirChannelStore;
 
 			_airChannelStore.Visibility = true;
-			_channelRadius = _airChannelStore.PreviewRadius;
+			_channelDiameter = _airChannelStore.PreviewDiameter;
 			_meshVM = mainViewModel.MeshVM;
 
 			_meshVM.MeshMouseDown += OnMeshHit;
@@ -33,7 +33,7 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			
 			ClearAirChannelsCommand = new RelayCommand(param => this.ClearAirChannels(), param => true);
 
-			_airChannelStore.PreviewRadius = _channelRadius;
+			_airChannelStore.PreviewDiameter = _channelDiameter;
 			_airChannelStore.PreviewHeight = _meshVM.BolusHeight;
 		}
 		public override void OnExit() {
@@ -42,19 +42,19 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			_meshVM.MeshMouseMove -= OnMeshMove;
 		}
 
-		private float _channelRadius;
-		public float ChannelRadius {
-			get => _channelRadius;
+		private float _channelDiameter;
+		public float ChannelDiameter {
+			get => _channelDiameter;
 			set {
-				_channelRadius = value;
-				_airChannelStore.PreviewRadius = _channelRadius;
-				OnPropertyChanged(nameof(ChannelRadius));
+				_channelDiameter = value;
+				_airChannelStore.PreviewDiameter = _channelDiameter;
+				OnPropertyChanged(nameof(ChannelDiameter));
 			}
 		}
 
 		#region Air Channel Mesh
 		private void AddAirChannel(Point3D point) {
-			AirChannel a = new AirChannel(point, _channelRadius, _meshVM.BolusHeight - (float)point.Z + 5);
+			AirChannel a = new AirChannel(point, _channelDiameter, _meshVM.BolusHeight - (float)point.Z + 5);
 			_airChannelStore.AddChannel(a);
 			_meshVM.SetLowestAirChannelPoint(_airChannelStore.LowestAirChannel);
 		}

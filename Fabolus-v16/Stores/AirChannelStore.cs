@@ -1,12 +1,10 @@
 ﻿using Fabolus_v16.MVVM.Models;
-using Fabolus_v16.MVVM.ViewModels;
-using g3;
+using HelixToolkit.Wpf;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
-using HelixToolkit.Wpf;
-using System.Linq;
 
 namespace Fabolus_v16.Stores {
 	public class AirChannelStore {
@@ -73,11 +71,11 @@ namespace Fabolus_v16.Stores {
 			}
 		}
 
-		private float _previewRadius;
-		public float PreviewRadius {
-			get => _previewRadius;
+		private float _previewDiameter;
+		public float PreviewDiameter {
+			get => _previewDiameter;
 			set {
-				_previewRadius = value;
+				_previewDiameter = value;
 				OnPreviewChannelChanged();
 			}
 		}
@@ -108,7 +106,7 @@ namespace Fabolus_v16.Stores {
 				var skin = new DiffuseMaterial(new SolidColorBrush(Color));
 				skin.Brush.Opacity = Opacity;
 				var result = new GeometryModel3D(
-					new AirChannel(_previewPoint, _previewRadius, _previewHeight).Mesh, 
+					new AirChannel(_previewPoint, _previewDiameter, _previewHeight).Mesh, 
 					skin);
 				result.BackMaterial = skin;
 
@@ -121,7 +119,7 @@ namespace Fabolus_v16.Stores {
 			_airChannels = new List<AirChannel>();
 			Color = Colors.Blue;
 			Opacity = 1.0f;
-			_previewRadius = 2.5f;
+			_previewDiameter = 5.0f;
 		}
 
 
