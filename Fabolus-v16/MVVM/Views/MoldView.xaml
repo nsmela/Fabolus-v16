@@ -23,6 +23,7 @@
                 VerticalAlignment="Top" 
                 Margin="4,0,4,0">
         <ToggleButton Content="advanced settings"
+                      Command="{Binding ToggleAdvancedSettingsVisibilityCommand}"
                       x:Name="VisibilityToggle" 
                       Style="{StaticResource MahApps.Styles.Button}"
                       HorizontalAlignment="Stretch" 
@@ -32,7 +33,8 @@
                       FontFamily="\Fonts\#Poppins" 
                       Margin="0,4,0,4"/>
 
-        <StackPanel x:Name="AdvancedSettingsPanel" Visibility="{Binding IsChecked, ElementName=VisibilityToggle, Converter={StaticResource ShowMoldSettings}}" >
+        <StackPanel x:Name="AdvancedSettingsPanel" Visibility="{Binding AdvancedSettingsVisibility}" >
+            
             <ToggleButton Content="Preview On" Margin="0,4,0,4"/>
             <Label Content="mold offset" 
                         HorizontalAlignment="Center" 

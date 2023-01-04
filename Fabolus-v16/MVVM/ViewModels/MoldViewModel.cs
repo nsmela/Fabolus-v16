@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -101,8 +102,30 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			set;
 		}
 
-		#region Scale
-		private double _scaleX;
+        #region Visibility
+
+		private Visibility _visibility = Visibility.Collapsed;
+		public Visibility AdvancedSettingsVisibility {
+			get => _visibility;
+			set {
+				_visibility = value;
+                OnPropertyChanged(nameof(AdvancedSettingsVisibility));
+            }
+		}
+
+		public ICommand ToggleAdvancedSettingsVisibilityCommand { get; }
+		private void ToggledvancedSettingsVisibility() {
+			if (AdvancedSettingsVisibility == Visibility.Collapsed)
+				AdvancedSettingsVisibility = Visibility.Visible;
+
+			else 
+				AdvancedSettingsVisibility = Visibility.Collapsed;
+		}
+
+        #endregion
+
+        #region Scale
+        private double _scaleX;
 		public double ScaleX { get => _scaleX; set { _scaleX = value; OnPropertyChanged(nameof(ScaleX)); } }
 		public ICommand ScaleXSliderDragCompleteCommand { get; }
 		private void ScaleXSliderDragComplete() {
@@ -169,7 +192,6 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		private void GenerateMold() {
 			_airChannelStore.Visibility = false;
 			_bolusStore.GenerateMold(_airChannelStore.AirChannels);
-			//_bolusStore.GenerateMoldWithAirChannels(_airChannelStore.AirChannels);
 			
 		}
 
@@ -190,6 +212,7 @@ namespace Fabolus_v16.MVVM.ViewModels {
 			MoldShapes.Add(MoldTypes.FLATBOTTOM);
 			MoldShapes.Add(MoldTypes.CONTOURED);
 
+			ToggleAdvancedSettingsVisibilityCommand = new RelayCommand(param => this.ToggledvancedSettingsVisibility(), param => true);
 
 			ScaleX = _bolusStore.MoldScaleX;
 			ScaleY = _bolusStore.MoldScaleY;
