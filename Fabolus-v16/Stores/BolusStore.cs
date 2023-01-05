@@ -356,13 +356,16 @@ namespace Fabolus_v16.Stores {
 				case MoldTypes.CONTOUREDEXTENDED:
 					result = BolusTools.GenerateContourExtendedMold(rotated_mesh, _moldOffset, _moldResolution, _airChannelStore.AirChannels);
 					break;
+				case MoldTypes.TROUGH:
+					result = BolusTools.GenerateTroughMold(rotated_mesh, MoldOffset, MoldResolution, 5.0f, 6.0f);
+					break;
 				default:
 					result = BolusTools.GenerateMold(rotated_mesh, _moldOffset, _moldResolution);
 					break;
 
 			}
 
-			MeshTransforms.Scale(result, _moldScaleX, _moldScaleY, _moldScaleZ);
+			MeshTransforms.Scale(result, _moldScaleX, _moldScaleY, _moldScaleZ); //manually adjust
 
 			_previewMoldMesh = result;
 			DiffuseMaterial material = new(new SolidColorBrush(_moldColor));

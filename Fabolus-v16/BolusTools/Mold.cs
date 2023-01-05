@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media.Media3D;
 using Fabolus_v16.MVVM.Models;
 using g3;
-using gs;
-using HelixToolkit.Wpf;
+using Serilog;
 
 namespace Fabolus_v16 {
     public static partial class BolusTools {
@@ -128,8 +122,29 @@ namespace Fabolus_v16 {
 
 			return new DMesh3(BolusTools.BooleanUnion(offsetMold, tubes));
 		}
+        public static DMesh3 GenerateTroughMold(DMesh3 mesh, double meshOffset, int resolution, double troughWidth, double troughHeight) {
+            //create an inflated mold to contain the original
+            var offsetMesh = OffsetMesh(mesh, meshOffset, resolution);
 
-		public static DMesh3 GenerateFinalMold(DMesh3 previewMold, DMesh3 bolus, List<AirChannel> airChannels)
+            //bitmap use to define how the mesh voxilization goes
+            Bitmap3 bmp = MeshBitmap(offsetMesh, resolution);
+
+			bmp = BitmapBox(bmp); //box the bitmap: for each voxel filled, all voxels above it are filled
+           
+			//add a trough to the mesh by modifying the bitmap
+            bmp = AddBitmapTrough(bmp, offsetMesh.CachedBounds.MaxDim / resolution, troughWidth, troughHeight);
+
+            //turn it into a voxilized mesh
+            VoxelSurfaceGenerator voxGen = new VoxelSurfaceGenerator();
+            voxGen.Voxels = bmp;
+            voxGen.Generate();
+            var result = new DMesh3(MarchingCubesSmoothing(voxGen.Meshes[0], resolution/2));
+            CentreMesh(result, offsetMesh);
+
+            return result;
+        }
+
+        public static DMesh3 GenerateFinalMold(DMesh3 previewMold, DMesh3 bolus, List<AirChannel> airChannels)
 		{
 			//invert bolus normals and append it to the preview mold
 
@@ -157,7 +172,10 @@ namespace Fabolus_v16 {
 			return new DMesh3(BolusTools.BooleanSubtraction(mold, tubes));
 		}
 
-		static DMesh3 VoxilizedMold(DMesh3 mesh, double airholeLevel, int numcells)
+
+
+
+        static DMesh3 VoxilizedMold(DMesh3 mesh, double airholeLevel, int numcells)
 		{
 
 			int airhole_z_height = Convert.ToInt32((mesh.CachedBounds.Height / numcells) * airholeLevel);
@@ -240,7 +258,7 @@ namespace Fabolus_v16 {
 			}
 
 			//cycles from top to bottom
-			//filled is original is filled
+			//filled if original is filled
 			//if not, counts how far from a filled cell above itself
 			//-1 if whole cell stack is empty so far
 			for (int z = zTop - 1; z >= 0; z--)
@@ -381,6 +399,125 @@ namespace Fabolus_v16 {
 
 
 			return bmp;
+		}
+
+		static Bitmap3 AddBitmapTrough(Bitmap3 sourceBmp, double cellSize, double troughWidth, double troughHeight) {
+            Log.Information($"new trough mesh attempt:");
+            Log.Information($"dimensions: x {sourceBmp.Dimensions.x.ToString("0.000")}, " +
+                $"y {sourceBmp.Dimensions.y.ToString("0.000")}, " +
+                $"z {sourceBmp.Dimensions.z.ToString("0.000")}");
+
+            //testing, add 20 cells above existing bmp
+            int cellsCountZ = (int)(troughHeight / cellSize);
+			int cellsCountXY = Math.Max(6, (int)(troughWidth / cellSize));
+            var new_z = sourceBmp.Dimensions.z + cellsCountZ;
+            Log.Information($"new z: {new_z}");
+
+			var newBmp = new Bitmap3(new Vector3i(sourceBmp.Dimensions.x, sourceBmp.Dimensions.y, new_z));
+
+            //to find highest z
+            int z_top = 0;
+            //fill the new bitmap
+            foreach (var bit in sourceBmp.NonZeros()) {
+				newBmp.Set(new Vector3i(bit.x, bit.y, bit.z), true);
+				if (bit.z > z_top) z_top = bit.z;
+			}
+
+            Log.Information($"highest z: {z_top}");
+
+			//adding to top
+			//search from the edges on xy grid on z_top layer
+			//first true bool adds cells (as long as a true is under that cell)
+			//also check to ensure don't reach edge
+			
+			//along x positive and negative
+			for (int y = 0; y < newBmp.Dimensions.y; y++) {
+				//x positive
+				for (int x = 0; x < newBmp.Dimensions.x; x++) {
+                    if (newBmp.Get(new Vector3i(x, y, z_top))) {
+						for(int x_count = 0; x_count < cellsCountXY; x_count++) {
+                            //has reached the end?
+							if (x + x_count >= newBmp.Dimensions.x) break;
+                            //is there a bit on the layer below?
+                            if (!newBmp.Get(new Vector3i(x + x_count, y, z_top))) break;
+
+							for (int z_count = 1; z_count < cellsCountZ; z_count++) {
+								Vector3i index = new Vector3i(x + x_count, y, z_top + z_count);
+								newBmp.Set(index, true); 
+							}
+						}
+						break;
+					}
+
+                }
+				//x negative
+                for (int x = newBmp.Dimensions.x - 1; x >= 0; x--) {
+                    if (newBmp.Get(new Vector3i(x, y, z_top))) {
+                        for (int x_count = 0; x_count < cellsCountXY; x_count++) {
+                            //has reached the end?
+                            if (x - x_count < 0) break;
+                            //is there a bit on the layer below?
+                            if (!newBmp.Get(new Vector3i(x - x_count, y, z_top))) break;
+
+                            for (int z_count = 1; z_count < cellsCountZ; z_count++) {
+                                Vector3i index = new Vector3i(x - x_count, y, z_top + z_count);
+                                newBmp.Set(index, true);
+                            }
+                        }
+                        break;
+                    }
+
+                }
+            }
+
+            //along y positive and negative
+            for (int x = 0; x < newBmp.Dimensions.x; x++) {
+                //y positive
+                for (int y = 0; y < newBmp.Dimensions.y; y++) {
+                    if (newBmp.Get(new Vector3i(x, y, z_top))) {
+                        for (int y_count = 0; y_count < cellsCountXY; y_count++) {
+                            //has reached the end?
+                            if (y + y_count >= newBmp.Dimensions.y) break;
+                            //is there a bit on the layer below?
+                            if (!newBmp.Get(new Vector3i(x, y + y_count, z_top))) break;
+
+                            for (int z_count = 1; z_count < cellsCountZ; z_count++) {
+                                Vector3i index = new Vector3i(x, y + y_count, z_top + z_count);
+                                newBmp.Set(index, true);
+                            }
+                        }
+                        break;
+                    }
+
+                }
+                //y negative
+                for (int y = newBmp.Dimensions.y - 1; y >= 0; y--) {
+                    if (newBmp.Get(new Vector3i(x, y, z_top))) {
+                        for (int y_count = 0; y_count < cellsCountXY; y_count++) {
+                            //has reached the end?
+                            if (y - y_count < 0) break;
+                            //is there a bit on the layer below?
+                            if (!newBmp.Get(new Vector3i(x, y - y_count, z_top))) break;
+
+                            for (int z_count = 1; z_count < cellsCountZ; z_count++) {
+                                Vector3i index = new Vector3i(x, y - y_count, z_top + z_count);
+                                newBmp.Set(index, true);
+                            }
+                        }
+                        break;
+                    }
+
+                }
+            }
+
+            //checking
+            foreach (var bit in newBmp.NonZeros()) {
+                if (bit.z > z_top) z_top = bit.z;
+            }
+
+            Log.Information($"new highest z: {z_top}");
+
+            return newBmp;
 		}
 
 		static void CentreMesh(DMesh3 mesh, DMesh3 originalMesh)

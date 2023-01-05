@@ -54,7 +54,7 @@ namespace Fabolus_v16.MVVM.ViewModels {
 
 		#region Air Channel Mesh
 		private void AddAirChannel(Point3D point) {
-			AirChannel a = new AirChannel(point, _channelDiameter, _meshVM.BolusHeight - (float)point.Z + 5);
+			AirChannel a = new AirChannel(point, _channelDiameter, _meshVM.BolusHeight - (float)point.Z + 20);
 			_airChannelStore.AddChannel(a);
 			_meshVM.SetLowestAirChannelPoint(_airChannelStore.LowestAirChannel);
 		}

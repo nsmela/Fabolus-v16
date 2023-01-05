@@ -19,14 +19,13 @@ namespace Fabolus_v16.MVVM.ViewModels {
 		[Description("Flatten Bottom")] FLATBOTTOM,
 		[Description("Flatten Top")] FLATTOP,
 		[Description("Contour")] CONTOURED,
-		[Description("Contour Extended")] CONTOUREDEXTENDED
+		[Description("Contour Extended")] CONTOUREDEXTENDED,
+		[Description("Box with Trough")] TROUGH
 	}
 
 	public class MoldTypeEnumToIntValueConverter : IValueConverter {
 		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
 			MoldTypes mold = (MoldTypes)(int)Math.Round((double)value);
-			//MoldTypes mold = (MoldTypes)(value);
-			//var mold = value;
 			var attributes = mold.GetType().GetField(mold.ToString()).GetCustomAttributes(typeof(DescriptionAttribute), false);
 
 			if (attributes.Any())
@@ -105,13 +104,7 @@ namespace Fabolus_v16.MVVM.ViewModels {
         #region Visibility
 
 		private Visibility _visibility = Visibility.Collapsed;
-		public Visibility AdvancedSettingsVisibility {
-			get => _visibility;
-			set {
-				_visibility = value;
-                OnPropertyChanged(nameof(AdvancedSettingsVisibility));
-            }
-		}
+		public Visibility AdvancedSettingsVisibility { get => _visibility; set { _visibility = value; OnPropertyChanged(nameof(AdvancedSettingsVisibility));  } }
 
 		public ICommand ToggleAdvancedSettingsVisibilityCommand { get; }
 		private void ToggledvancedSettingsVisibility() {
